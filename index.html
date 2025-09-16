@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio performance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    .eur-blur { filter: blur(6px); }
+    .select-wrap { position: relative; }
+    .select-wrap:after {
+      content: ""; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      border-left: 6px solid transparent; border-right: 6px solid transparent;
+      border-top: 6px solid #334155; pointer-events: none;
+    }
+    table.k-grid th { background-color: #f1f5f9; color:#334155; border-bottom:1px solid #e2e8f0; }
+    table.k-grid td { border-bottom:1px dashed #e2e8f0; }
+    .eur-figure { transition: filter .2s ease; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <header class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 text-white">
+    <div class="max-w-6xl mx-auto px-6 pt-8 pb-6 flex items-center justify-between gap-4">
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Portfolio performance</h1>
+      <button id="btnEuros" class="shrink-0 inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-400">
+        <span>Ver EUROS</span>
+        <svg id="iconEuros" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 space-y-10 md:space-y-14">
+    <!-- BLOQUE 1 -->
+    <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8 -mt-6">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+        <div class="grid grid-cols-2 gap-4 md:w-auto">
+          <div>
+            <label for="desdeSelect" class="block text-sm font-medium text-slate-600 mb-2">Desde (año)</label>
+            <select id="desdeSelect" class="w-full rounded-xl border border-slate-400 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600"></select>
+          </div>
+          <div>
+            <label for="hastaSelect" class="block text-sm font-medium text-slate-600 mb-2">Hasta (año)</label>
+            <select id="hastaSelect" class="w-full rounded-xl border border-slate-400 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-600 focus:border-slate-600"></select>
+          </div>
+        </div>
+      </div>
+      <h2 class="text-lg md:text-xl font-semibold text-slate-700 mb-3"> Evolucion de la cartera</h2>
+      <div class="relative">
+        <canvas id="mixChart" class="w-full h-[320px] md:h-[500px]"></canvas>
+      </div>
+      <div id="emptyState" class="hidden mt-6 p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-600">
+        No hay datos para el rango seleccionado.
+      </div>
+    </section>
+
+    <!-- BLOQUE 2 -->
+    <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+      <h3 class="text-lg md:text-xl font-semibold text-slate-700 mb-4">Evolución del capital (anual)</h3>
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-separate border-spacing-y-2 k-grid">
+          <thead>
+            <tr class="text-sm text-slate-600" id="ec-head-row">
+              <th class="text-left italic font-bold pr-4">Evolucion Capital</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr id="ec-row-cap">
+              <td class="font-medium text-slate-700 pr-4">Capital Aportado</td>
+            </tr>
+            <tr id="ec-row-capA">
+              <td class="font-medium text-slate-700 pr-4">Capital acumulado</td>
+            </tr>
+            <tr id="ec-row-plus">
+              <td class="font-medium text-slate-700 pr-4">Plusvalía/Minusvalía</td>
+            </tr>
+            <tr id="ec-row-plusA">
+              <td class="font-medium text-slate-700 pr-4">Plusvalía acumulada</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOQUE 3 -->
+    <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg md:text-xl font-semibold text-slate-700">Desglose de rentabilidad</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center">
+        <div class="md:col-span-2">
+          <canvas id="donutChart" class="w-full h-[280px] md:h-[340px]"></canvas>
+        </div>
+        <div class="md:col-span-1">
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 space-y-2" id="breakdownBox"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOQUE 4 -->
+    <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+        <div class="select-wrap md:w-64">
+          <label for="rfSelect" class="block text-sm font-medium text-slate-600 mb-2">Fondo</label>
+          <select id="rfSelect" class="w-full appearance-none rounded-xl border border-slate-500 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-slate-700 px-3 py-2"></select>
+        </div>
+      </div>
+      <div class="relative mb-6">
+        <canvas id="rfChart" class="w-full h-[300px] md:h-[420px]"></canvas>
+      </div>
+      <div id="rfEmpty" class="hidden mt-4 p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-600">
+        No hay datos de <span class="font-medium">ValorFondosRentaFija</span> para mostrar.
+      </div>
+
+      <h4 class="text-base md:text-lg font-semibold text-slate-700 mt-6 mb-3">Rentabilidad mensual por fondo (%)</h4>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm k-grid" id="rfTable">
+          <thead class="text-slate-600">
+            <tr id="rfHead">
+              <th class="text-left p-2">Periodo</th>
+            </tr>
+          </thead>
+          <tbody id="rfBody" class="text-slate-800"></tbody>
+        </table>
+      </div>
+      <p class="mt-2 text-xs text-slate-500">Nota: verde/rojo resaltan el mejor/peor fondo de cada mes entre comparables (excluye Foncuenta y Total). La columna Total usa una escala cromática sobre su propio histórico.</p>
+    </section>
+
+    <!-- BLOQUE 5 -->
+    <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+      <h3 class="text-lg md:text-xl font-semibold text-slate-700 mb-4">Evolución por activos (trimestral)</h3>
+      <div class="relative mb-6">
+        <canvas id="stackedActivos" class="w-full h-[300px] md:h-[420px]"></canvas>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm k-grid" id="activosTable">
+          <thead>
+            <tr id="activosHead"><th class="p-2 text-left">Activo / Trimestre</th></tr>
+          </thead>
+          <tbody id="activosBody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="py-10 text-center text-xs text-slate-500">
+      Reporte de cartera — resolución adaptativa (mensual/trimestral), base 100 y análisis anual.
+    </footer>
+  </main>
+
+  <!-- ========= DATOS EMBEBIDOS ========= -->
+  <script type="application/json" id="vp-data">[{"Year":2020,"Month":1,"Trimestre":"Q1","ValorParticipacion":100,"Comentario":"","CashIn":0.0,"Revalorizacion":0.0,"TotalInversion":0.0},{"Year":2020,"Month":2,"Trimestre":"Q1","ValorParticipacion":99.89761406093361,"Comentario":"COVID19","CashIn":0.0,"Revalorizacion":-10238.0,"TotalInversion":1247502.0},{"Year":2020,"Month":3,"Trimestre":"Q1","ValorParticipacion":98.74260713435297,"Comentario":"","CashIn":0.0,"Revalorizacion":-14390.0,"TotalInversion":1233112.0},{"Year":2020,"Month":4,"Trimestre":"Q2","ValorParticipacion":100.32716857749761,"Comentario":"","CashIn":100000.0,"Revalorizacion":31700.0,"TotalInversion":1364812.0},{"Year":2020,"Month":5,"Trimestre":"Q2","ValorParticipacion":100.39267015706806,"Comentario":"","CashIn":0.0,"Revalorizacion":685.0,"TotalInversion":1365497.0},{"Year":2020,"Month":6,"Trimestre":"Q2","ValorParticipacion":101.0746583773456,"Comentario":"","CashIn":0.0,"Revalorizacion":9338.0,"TotalInversion":1374835.0},{"Year":2020,"Month":7,"Trimestre":"Q3","ValorParticipacion":101.78317500569964,"Comentario":"","CashIn":0.0,"Revalorizacion":9593.0,"TotalInversion":1384428.0},{"Year":2020,"Month":8,"Trimestre":"Q3","ValorParticipacion":101.98069548025132,"Comentario":"","CashIn":0.0,"Revalorizacion":2723.0,"TotalInversion":1387151.0},{"Year":2020,"Month":9,"Trimestre":"Q3","ValorParticipacion":102.11386964618228,"Comentario":"","CashIn":0.0,"Revalorizacion":1734.0,"TotalInversion":1388885.0},{"Year":2020,"Month":10,"Trimestre":"Q4","ValorParticipacion":102.30517023907946,"Comentario":"","CashIn":0.0,"Revalorizacion":2592.0,"TotalInversion":1391477.0},{"Year":2020,"Month":11,"Trimestre":"Q4","ValorParticipacion":102.71110004633657,"Comentario":"","CashIn":0.0,"Revalorizacion":5703.0,"TotalInversion":1397180.0},{"Year":2020,"Month":12,"Trimestre":"Q4","ValorParticipacion":102.9692762665425,"Comentario":"","CashIn":0.0,"Revalorizacion":3656.0,"TotalInversion":1400836.0},{"Year":2021,"Month":1,"Trimestre":"Q1","ValorParticipacion":103.42339030852486,"Comentario":"","CashIn":0.0,"Revalorizacion":6409.0,"TotalInversion":1407245.0},{"Year":2021,"Month":2,"Trimestre":"Q1","ValorParticipacion":103.52515390556863,"Comentario":"","CashIn":0.0,"Revalorizacion":1413.0,"TotalInversion":1408658.0},{"Year":2021,"Month":3,"Trimestre":"Q1","ValorParticipacion":103.7962764227631,"Comentario":"","CashIn":0.0,"Revalorizacion":3967.0,"TotalInversion":1412625.0},{"Year":2021,"Month":4,"Trimestre":"Q2","ValorParticipacion":104.09813613090997,"Comentario":"","CashIn":0.0,"Revalorizacion":4405.0,"TotalInversion":1417030.0},{"Year":2021,"Month":5,"Trimestre":"Q2","ValorParticipacion":104.13291252681054,"Comentario":"","CashIn":0.0,"Revalorizacion":549.0,"TotalInversion":1417579.0},{"Year":2021,"Month":6,"Trimestre":"Q2","ValorParticipacion":104.25918086850721,"Comentario":"","CashIn":0.0,"Revalorizacion":1776.0,"TotalInversion":1419355.0},{"Year":2021,"Month":7,"Trimestre":"Q3","ValorParticipacion":104.49838230603049,"Comentario":"","CashIn":0.0,"Revalorizacion":3390.0,"TotalInversion":1422745.0},{"Year":2021,"Month":8,"Trimestre":"Q3","ValorParticipacion":104.90415792118279,"Comentario":"","CashIn":0.0,"Revalorizacion":5788.0,"TotalInversion":1428533.0},{"Year":2021,"Month":9,"Trimestre":"Q3","ValorParticipacion":104.84222278957889,"Comentario":"","CashIn":0.0,"Revalorizacion":-858.0,"TotalInversion":1427675.0},{"Year":2021,"Month":10,"Trimestre":"Q4","ValorParticipacion":104.9793828493001,"Comentario":"","CashIn":0.0,"Revalorizacion":1971.0,"TotalInversion":1429646.0},{"Year":2021,"Month":11,"Trimestre":"Q4","ValorParticipacion":105.01744240621641,"Comentario":"","CashIn":0.0,"Revalorizacion":576.0,"TotalInversion":1430222.0},{"Year":2021,"Month":12,"Trimestre":"Q4","ValorParticipacion":105.21056389769554,"Comentario":"","CashIn":0.0,"Revalorizacion":2749.0,"TotalInversion":1432971.0},{"Year":2022,"Month":1,"Trimestre":"Q1","ValorParticipacion":105.31119399441043,"Comentario":"","CashIn":0.0,"Revalorizacion":1420.0,"TotalInversion":1434391.0},{"Year":2022,"Month":2,"Trimestre":"Q1","ValorParticipacion":105.2566107130443,"Comentario":"","CashIn":0.0,"Revalorizacion":-782.0,"TotalInversion":1433609.0},{"Year":2022,"Month":3,"Trimestre":"Q1","ValorParticipacion":105.18774609913403,"Comentario":"","CashIn":0.0,"Revalorizacion":-920.0,"TotalInversion":1432689.0},{"Year":2022,"Month":4,"Trimestre":"Q2","ValorParticipacion":104.75219010959889,"Comentario":"","CashIn":0.0,"Revalorizacion":-6093.0,"TotalInversion":1426596.0},{"Year":2022,"Month":5,"Trimestre":"Q2","ValorParticipacion":104.17547051848823,"Comentario":"","CashIn":0.0,"Revalorizacion":-7926.0,"TotalInversion":1418670.0},{"Year":2022,"Month":6,"Trimestre":"Q2","ValorParticipacion":104.07479155525972,"Comentario":"","CashIn":0.0,"Revalorizacion":-1178.0,"TotalInversion":1417492.0},{"Year":2022,"Month":7,"Trimestre":"Q3","ValorParticipacion":104.56863445036693,"Comentario":"","CashIn":0.0,"Revalorizacion":7167.0,"TotalInversion":1424659.0},{"Year":2022,"Month":8,"Trimestre":"Q3","ValorParticipacion":104.51174445886258,"Comentario":"","CashIn":0.0,"Revalorizacion":-829.0,"TotalInversion":1423830.0},{"Year":2022,"Month":9,"Trimestre":"Q3","ValorParticipacion":104.10699692294235,"Comentario":"","CashIn":0.0,"Revalorizacion":-5835.0,"TotalInversion":1417995.0},{"Year":2022,"Month":10,"Trimestre":"Q4","ValorParticipacion":104.57651072333647,"Comentario":"","CashIn":0.0,"Revalorizacion":6798.0,"TotalInversion":1424793.0},{"Year":2022,"Month":11,"Trimestre":"Q4","ValorParticipacion":105.26821078902884,"Comentario":"","CashIn":0.0,"Revalorizacion":10463.0,"TotalInversion":1435256.0},{"Year":2022,"Month":12,"Trimestre":"Q4","ValorParticipacion":105.43580402124748,"Comentario":"","CashIn":0.0,"Revalorizacion":2460.0,"TotalInversion":1437716.0},{"Year":2023,"Month":1,"Trimestre":"Q1","ValorParticipacion":105.67922615148514,"Comentario":"","CashIn":0.0,"Revalorizacion":3321.0,"TotalInversion":1441037.0},{"Year":2023,"Month":2,"Trimestre":"Q1","ValorParticipacion":105.98625982802755,"Comentario":"","CashIn":0.0,"Revalorizacion":4508.0,"TotalInversion":1445545.0},{"Year":2023,"Month":3,"Trimestre":"Q1","ValorParticipacion":105.43987455894509,"Comentario":"","CashIn":0.0,"Revalorizacion":-7735.0,"TotalInversion":1437810.0},{"Year":2023,"Month":4,"Trimestre":"Q2","ValorParticipacion":106.11880139171724,"Comentario":"","CashIn":0.0,"Revalorizacion":9743.0,"TotalInversion":1447553.0},{"Year":2023,"Month":5,"Trimestre":"Q2","ValorParticipacion":106.77389732058754,"Comentario":"","CashIn":0.0,"Revalorizacion":9555.0,"TotalInversion":1457108.0},{"Year":2023,"Month":6,"Trimestre":"Q2","ValorParticipacion":107.07241087362878,"Comentario":"","CashIn":0.0,"Revalorizacion":4338.0,"TotalInversion":1461446.0},{"Year":2023,"Month":7,"Trimestre":"Q3","ValorParticipacion":107.08913277993316,"Comentario":"","CashIn":87000.0,"Revalorizacion":2538.0,"TotalInversion":1550984.0},{"Year":2023,"Month":8,"Trimestre":"Q3","ValorParticipacion":107.2406092284844,"Comentario":"","CashIn":0.0,"Revalorizacion":2058.0,"TotalInversion":1553042.0},{"Year":2023,"Month":9,"Trimestre":"Q3","ValorParticipacion":106.9410150736601,"Comentario":"","CashIn":0.0,"Revalorizacion":-4399.0,"TotalInversion":1548643.0},{"Year":2023,"Month":10,"Trimestre":"Q4","ValorParticipacion":106.76064575750981,"Comentario":"","CashIn":0.0,"Revalorizacion":-2646.0,"TotalInversion":1545997.0},{"Year":2023,"Month":11,"Trimestre":"Q4","ValorParticipacion":107.46964652621753,"Comentario":"","CashIn":0.0,"Revalorizacion":10404.0,"TotalInversion":1556401.0},{"Year":2023,"Month":12,"Trimestre":"Q4","ValorParticipacion":108.17476517284352,"Comentario":"","CashIn":0.0,"Revalorizacion":10362.0,"TotalInversion":1566763.0},{"Year":2024,"Month":1,"Trimestre":"Q1","ValorParticipacion":108.39693931502697,"Comentario":"","CashIn":0.0,"Revalorizacion":3207.0,"TotalInversion":1569970.0},{"Year":2024,"Month":2,"Trimestre":"Q1","ValorParticipacion":108.51225921734127,"Comentario":"","CashIn":0.0,"Revalorizacion":1715.0,"TotalInversion":1571685.0},{"Year":2024,"Month":3,"Trimestre":"Q1","ValorParticipacion":108.9162242726533,"Comentario":"","CashIn":0.0,"Revalorizacion":6006.0,"TotalInversion":1577691.0},{"Year":2024,"Month":4,"Trimestre":"Q2","ValorParticipacion":108.69144928093005,"Comentario":"","CashIn":0.0,"Revalorizacion":-3108.0,"TotalInversion":1574583.0},{"Year":2024,"Month":5,"Trimestre":"Q2","ValorParticipacion":109.0157667784001,"Comentario":"","CashIn":0.0,"Revalorizacion":4980.0,"TotalInversion":1579563.0},{"Year":2024,"Month":6,"Trimestre":"Q2","ValorParticipacion":110.16041537461747,"Comentario":"","CashIn":0.0,"Revalorizacion":17677.0,"TotalInversion":1597240.0},{"Year":2024,"Month":7,"Trimestre":"Q3","ValorParticipacion":109.99414904704319,"Comentario":"","CashIn":0.0,"Revalorizacion":-2456.0,"TotalInversion":1594784.0},{"Year":2024,"Month":8,"Trimestre":"Q3","ValorParticipacion":110.21277375786812,"Comentario":"","CashIn":0.0,"Revalorizacion":3365.0,"TotalInversion":1598149.0},{"Year":2024,"Month":9,"Trimestre":"Q3","ValorParticipacion":110.52404959710662,"Comentario":"","CashIn":0.0,"Revalorizacion":4674.0,"TotalInversion":1602823.0},{"Year":2024,"Month":10,"Trimestre":"Q4","ValorParticipacion":110.56666986262016,"Comentario":"","CashIn":0.0,"Revalorizacion":617.0,"TotalInversion":1603440.0},{"Year":2024,"Month":11,"Trimestre":"Q4","ValorParticipacion":111.19340731246628,"Comentario":"","CashIn":0.0,"Revalorizacion":9752.0,"TotalInversion":1613192.0},{"Year":2024,"Month":12,"Trimestre":"Q4","ValorParticipacion":111.67519838222135,"Comentario":"","CashIn":0.0,"Revalorizacion":7456.0,"TotalInversion":1620648.0},{"Year":2025,"Month":1,"Trimestre":"Q1","ValorParticipacion":111.1878587450635,"Comentario":"","CashIn":0.0,"Revalorizacion":-11975.0,"TotalInversion":1608673.0},{"Year":2025,"Month":2,"Trimestre":"Q1","ValorParticipacion":110.78804771840207,"Comentario":"","CashIn":0.0,"Revalorizacion":-1800.0,"TotalInversion":1606873.0},{"Year":2025,"Month":3,"Trimestre":"Q1","ValorParticipacion":110.71285613315267,"Comentario":"","CashIn":0.0,"Revalorizacion":-1147.0,"TotalInversion":1605726.0},{"Year":2025,"Month":4,"Trimestre":"Q2","ValorParticipacion":110.67389979123162,"Comentario":"","CashIn":0.0,"Revalorizacion":-15000.0,"TotalInversion":1590726.0},{"Year":2025,"Month":5,"Trimestre":"Q2","ValorParticipacion":110.82652183982828,"Comentario":"","CashIn":0.0,"Revalorizacion":2210.0,"TotalInversion":1592936.0},{"Year":2025,"Month":6,"Trimestre":"Q2","ValorParticipacion":110.87991526675305,"Comentario":"","CashIn":0.0,"Revalorizacion":936.0,"TotalInversion":1593872.0},{"Year":2025,"Month":7,"Trimestre":"Q3","ValorParticipacion":111.19715061058392,"Comentario":"","CashIn":0.0,"Revalorizacion":5143.0,"TotalInversion":1599015.0},{"Year":2025,"Month":8,"Trimestre":"Q3","ValorParticipacion":111.1963098981425,"Comentario":"","CashIn":0.0,"Revalorizacion":-118.0,"TotalInversion":1598897.0},{"Year":2025,"Month":9,"Trimestre":"Q3","ValorParticipacion":111.43682915341863,"Comentario":"","CashIn":0.0,"Revalorizacion":3659.0,"TotalInversion":1602556.0}]</script>
+  <script type="application/json" id="ec-data">{"years":[2020,2021,2022,2023,2024,2025],"capital":[100000.0,87000.0,0.0,275000.0,0.0,0.0],"capital_acum":[100000.0,187000.0,187000.0,462000.0,462000.0,462000.0],"plusvalia":[-10735.0,28000.0,-16325.0,40344.0,49016.0,-70161.0],"plusvalia_acum":[-10735.0,17265.0,936.0,41280.0,90296.0,20135.0]}</script>
+  <script type="application/json" id="breakdown-data">{"Letras":8603.0,"FondosRF":37855.0,"RentaVariable":36959.0}</script>
+  <script type="application/json" id="rf-data">{"funds":["R4 FIJA 6M","R4 Fija Clase A","R4 Fija Clase R","Evli Renta Fija","Foncuenta","Total"],"rows":[{"Year":2023,"Month":12,"R4 FIJA 6M_EUR":728.0,"R4 FIJA 6M_PCT":0.54,"R4 Fija Clase A_EUR":807.0,"R4 Fija Clase A_PCT":1.04,"R4 Fija Clase R_EUR":136.0,"R4 Fija Clase R_PCT":0.48,"Evli Renta Fija_EUR":-5.0,"Evli Renta Fija_PCT":-0.02,"Foncuenta_EUR":44.0,"Foncuenta_PCT":0.39,"Total_EUR":1711.0,"Total_PCT":0.42},{"Year":2024,"Month":1,"R4 FIJA 6M_EUR":-667.0,"R4 FIJA 6M_PCT":-0.49,"R4 Fija Clase A_EUR":-491.0,"R4 Fija Clase A_PCT":-0.63,"R4 Fija Clase R_EUR":-202.0,"R4 Fija Clase R_PCT":-0.71,"Evli Renta Fija_EUR":994.0,"Evli Renta Fija_PCT":3.02,"Foncuenta_EUR":37.0,"Foncuenta_PCT":0.32,"Total_EUR":-329.0,"Total_PCT":-0.08},{"Year":2024,"Month":2,"R4 FIJA 6M_EUR":271.0,"R4 FIJA 6M_PCT":0.2,"R4 Fija Clase A_EUR":575.0,"R4 Fija Clase A_PCT":0.74,"R4 Fija Clase R_EUR":37.0,"R4 Fija Clase R_PCT":0.13,"Evli Renta Fija_EUR":-163.0,"Evli Renta Fija_PCT":-0.49,"Foncuenta_EUR":45.0,"Foncuenta_PCT":0.38,"Total_EUR":764.0,"Total_PCT":0.18},{"Year":2024,"Month":3,"R4 FIJA 6M_EUR":-383.0,"R4 FIJA 6M_PCT":-0.29,"R4 Fija Clase A_EUR":-359.0,"R4 Fija Clase A_PCT":-0.46,"R4 Fija Clase R_EUR":-148.0,"R4 Fija Clase R_PCT":-0.52,"Evli Renta Fija_EUR":-91.0,"Evli Renta Fija_PCT":-0.27,"Foncuenta_EUR":47.0,"Foncuenta_PCT":0.4,"Total_EUR":-934.0,"Total_PCT":-0.22},{"Year":2024,"Month":4,"R4 FIJA 6M_EUR":-191.0,"R4 FIJA 6M_PCT":-0.14,"R4 Fija Clase A_EUR":-154.0,"R4 Fija Clase A_PCT":-0.2,"R4 Fija Clase R_EUR":-41.0,"R4 Fija Clase R_PCT":-0.14,"Evli Renta Fija_EUR":-30.0,"Evli Renta Fija_PCT":-0.09,"Foncuenta_EUR":34.0,"Foncuenta_PCT":0.29,"Total_EUR":-382.0,"Total_PCT":-0.09},{"Year":2024,"Month":5,"R4 FIJA 6M_EUR":428.0,"R4 FIJA 6M_PCT":0.32,"R4 Fija Clase A_EUR":458.0,"R4 Fija Clase A_PCT":0.59,"R4 Fija Clase R_EUR":193.0,"R4 Fija Clase R_PCT":0.68,"Evli Renta Fija_EUR":-104.0,"Evli Renta Fija_PCT":-0.31,"Foncuenta_EUR":36.0,"Foncuenta_PCT":0.31,"Total_EUR":1011.0,"Total_PCT":0.23},{"Year":2024,"Month":6,"R4 FIJA 6M_EUR":1220.0,"R4 FIJA 6M_PCT":0.92,"R4 Fija Clase A_EUR":1422.0,"R4 Fija Clase A_PCT":1.85,"R4 Fija Clase R_EUR":440.0,"R4 Fija Clase R_PCT":1.55,"Evli Renta Fija_EUR":1253.0,"Evli Renta Fija_PCT":3.78,"Foncuenta_EUR":37.0,"Foncuenta_PCT":0.31,"Total_EUR":4372.0,"Total_PCT":1.02},{"Year":2024,"Month":7,"R4 FIJA 6M_EUR":-347.0,"R4 FIJA 6M_PCT":-0.26,"R4 Fija Clase A_EUR":-374.0,"R4 Fija Clase A_PCT":-0.48,"R4 Fija Clase R_EUR":-162.0,"R4 Fija Clase R_PCT":-0.57,"Evli Renta Fija_EUR":-30.0,"Evli Renta Fija_PCT":-0.09,"Foncuenta_EUR":41.0,"Foncuenta_PCT":0.35,"Total_EUR":-872.0,"Total_PCT":-0.2},{"Year":2024,"Month":8,"R4 FIJA 6M_EUR":462.0,"R4 FIJA 6M_PCT":0.35,"R4 Fija Clase A_EUR":367.0,"R4 Fija Clase A_PCT":0.47,"R4 Fija Clase R_EUR":157.0,"R4 Fija Clase R_PCT":0.55,"Evli Renta Fija_EUR":167.0,"Evli Renta Fija_PCT":0.5,"Foncuenta_EUR":43.0,"Foncuenta_PCT":0.37,"Total_EUR":1196.0,"Total_PCT":0.28},{"Year":2024,"Month":9,"R4 FIJA 6M_EUR":188.0,"R4 FIJA 6M_PCT":0.14,"R4 Fija Clase A_EUR":204.0,"R4 Fija Clase A_PCT":0.27,"R4 Fija Clase R_EUR":82.0,"R4 Fija Clase R_PCT":0.29,"Evli Renta Fija_EUR":143.0,"Evli Renta Fija_PCT":0.43,"Foncuenta_EUR":43.0,"Foncuenta_PCT":0.37,"Total_EUR":660.0,"Total_PCT":0.16},{"Year":2024,"Month":10,"R4 FIJA 6M_EUR":86.0,"R4 FIJA 6M_PCT":0.06,"R4 Fija Clase A_EUR":166.0,"R4 Fija Clase A_PCT":0.22,"R4 Fija Clase R_EUR":71.0,"R4 Fija Clase R_PCT":0.25,"Evli Renta Fija_EUR":-143.0,"Evli Renta Fija_PCT":-0.43,"Foncuenta_EUR":44.0,"Foncuenta_PCT":0.39,"Total_EUR":224.0,"Total_PCT":0.05},{"Year":2024,"Month":11,"R4 FIJA 6M_EUR":629.0,"R4 FIJA 6M_PCT":0.47,"R4 Fija Clase A_EUR":715.0,"R4 Fija Clase A_PCT":0.93,"R4 Fija Clase R_EUR":299.0,"R4 Fija Clase R_PCT":1.05,"Evli Renta Fija_EUR":298.0,"Evli Renta Fija_PCT":0.89,"Foncuenta_EUR":47.0,"Foncuenta_PCT":0.41,"Total_EUR":2017.0,"Total_PCT":0.47},{"Year":2024,"Month":12,"R4 FIJA 6M_EUR":497.0,"R4 FIJA 6M_PCT":0.37,"R4 Fija Clase A_EUR":796.0,"R4 Fija Clase A_PCT":1.03,"R4 Fija Clase R_EUR":357.0,"R4 Fija Clase R_PCT":1.25,"Evli Renta Fija_EUR":155.0,"Evli Renta Fija_PCT":0.47,"Foncuenta_EUR":48.0,"Foncuenta_PCT":0.41,"Total_EUR":1853.0,"Total_PCT":0.43},{"Year":2025,"Month":1,"R4 FIJA 6M_EUR":-192.0,"R4 FIJA 6M_PCT":-0.14,"R4 Fija Clase A_EUR":-221.0,"R4 Fija Clase A_PCT":-0.29,"R4 Fija Clase R_EUR":-55.0,"R4 Fija Clase R_PCT":-0.19,"Evli Renta Fija_EUR":-1270.0,"Evli Renta Fija_PCT":-3.79,"Foncuenta_EUR":49.0,"Foncuenta_PCT":0.42,"Total_EUR":-1689.0,"Total_PCT":-0.39},{"Year":2025,"Month":2,"R4 FIJA 6M_EUR":-90.0,"R4 FIJA 6M_PCT":-0.07,"R4 Fija Clase A_EUR":-231.0,"R4 Fija Clase A_PCT":-0.3,"R4 Fija Clase R_EUR":-96.0,"R4 Fija Clase R_PCT":-0.33,"Evli Renta Fija_EUR":286.0,"Evli Renta Fija_PCT":0.86,"Foncuenta_EUR":51.0,"Foncuenta_PCT":0.43,"Total_EUR":-80.0,"Total_PCT":-0.02},{"Year":2025,"Month":3,"R4 FIJA 6M_EUR":-218.0,"R4 FIJA 6M_PCT":-0.16,"R4 Fija Clase A_EUR":-225.0,"R4 Fija Clase A_PCT":-0.29,"R4 Fija Clase R_EUR":-90.0,"R4 Fija Clase R_PCT":-0.31,"Evli Renta Fija_EUR":45.0,"Evli Renta Fija_PCT":0.13,"Foncuenta_EUR":50.0,"Foncuenta_PCT":0.42,"Total_EUR":-439.0,"Total_PCT":-0.1},{"Year":2025,"Month":4,"R4 FIJA 6M_EUR":-190.0,"R4 FIJA 6M_PCT":-0.14,"R4 Fija Clase A_EUR":-13.0,"R4 Fija Clase A_PCT":-0.02,"R4 Fija Clase R_EUR":-6.0,"R4 Fija Clase R_PCT":-0.02,"Evli Renta Fija_EUR":-1505.0,"Evli Renta Fija_PCT":-4.49,"Foncuenta_EUR":52.0,"Foncuenta_PCT":0.44,"Total_EUR":-1661.0,"Total_PCT":-0.38},{"Year":2025,"Month":5,"R4 FIJA 6M_EUR":78.0,"R4 FIJA 6M_PCT":0.06,"R4 Fija Clase A_EUR":142.0,"R4 Fija Clase A_PCT":0.19,"R4 Fija Clase R_EUR":61.0,"R4 Fija Clase R_PCT":0.22,"Evli Renta Fija_EUR":330.0,"Evli Renta Fija_PCT":0.99,"Foncuenta_EUR":56.0,"Foncuenta_PCT":0.47,"Total_EUR":667.0,"Total_PCT":0.15},{"Year":2025,"Month":6,"R4 FIJA 6M_EUR":181.0,"R4 FIJA 6M_PCT":0.14,"R4 Fija Clase A_EUR":75.0,"R4 Fija Clase A_PCT":0.1,"R4 Fija Clase R_EUR":33.0,"R4 Fija Clase R_PCT":0.12,"Evli Renta Fija_EUR":69.0,"Evli Renta Fija_PCT":0.21,"Foncuenta_EUR":56.0,"Foncuenta_PCT":0.47,"Total_EUR":414.0,"Total_PCT":0.1},{"Year":2025,"Month":7,"R4 FIJA 6M_EUR":423.0,"R4 FIJA 6M_PCT":0.32,"R4 Fija Clase A_EUR":355.0,"R4 Fija Clase A_PCT":0.46,"R4 Fija Clase R_EUR":141.0,"R4 Fija Clase R_PCT":0.49,"Evli Renta Fija_EUR":280.0,"Evli Renta Fija_PCT":0.83,"Foncuenta_EUR":58.0,"Foncuenta_PCT":0.49,"Total_EUR":1257.0,"Total_PCT":0.29},{"Year":2025,"Month":8,"R4 FIJA 6M_EUR":115.0,"R4 FIJA 6M_PCT":0.09,"R4 Fija Clase A_EUR":26.0,"R4 Fija Clase A_PCT":0.03,"R4 Fija Clase R_EUR":11.0,"R4 Fija Clase R_PCT":0.04,"Evli Renta Fija_EUR":523.0,"Evli Renta Fija_PCT":1.55,"Foncuenta_EUR":62.0,"Foncuenta_PCT":0.52,"Total_EUR":737.0,"Total_PCT":0.17}]}</script>
+  <script type="application/json" id="ea-data">{"quarters":["2024-Q1","2024-Q2","2024-Q3","2024-Q4","2025-Q1","2025-Q2","2025-Q3"],"assets":["Renta Fija","Renta Variable","Letras","Liquidez","Total"],"values":{"Renta Fija":[20000.0,23000.0,24000.0,26000.0,21000.0,22000.0,22500.0],"Renta Variable":[18000.0,19000.0,21000.0,23000.0,22000.0,21500.0,22000.0],"Letras":[5000.0,6000.0,7000.0,8000.0,7500.0,7600.0,7800.0],"Liquidez":[3000.0,3500.0,3200.0,3300.0,3100.0,3050.0,3000.0],"Total":[46000.0,51500.0,55200.0,60300.0,53600.0,54150.0,55300.0]}}</script>
+
+  <script>
+    const MAX_YEAR=2025, MAX_MONTH=9;
+    const monthToLabel=m=>String(m).padStart(2,'0');
+    const fmtNumber=(n,maxFrac=2)=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:maxFrac}).format(n);
+    const fmtEUR=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+    const fmtFixed=(n,fd=2)=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:fd,maximumFractionDigits:fd}).format(n);
+    const fmtPct2=(n)=> (Number.isFinite(n)? (new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+' %') : '—');
+    const dateRank=(y,m)=>new Date(y,m-1,28).getTime();
+    const qEndMonth = q => (q==='Q1'?3:(q==='Q2'?6:(q==='Q3'?9:12)));
+
+    function parseJSON(id){ try{ return JSON.parse(document.getElementById(id).textContent.trim()||'[]'); }catch(e){ console.error('JSON parse error for',id,e); return id==='ec-data'?{}:[]; } }
+    function filterMaxDate(rows){ return rows.filter(d => (d.Year<MAX_YEAR) || (d.Year===MAX_YEAR && d.Month<=MAX_MONTH)); }
+    function groupBy(arr, keyFn){ const m=new Map(); for(const it of arr){ const k=keyFn(it); if(!m.has(k)) m.set(k,[]); m.get(k).push(it);} return m; }
+
+    function aggregateMonthly(rows){
+      const map=new Map();
+      for(const r of rows){
+        const key=`${r.Year}-${monthToLabel(r.Month)}`;
+        const rank=dateRank(r.Year,r.Month);
+        const prev=map.get(key);
+        if(!prev||rank>=prev.rank) map.set(key,{label:key,rank,valor:r.ValorParticipacion,reval:r.Revalorizacion,comment:r.Comentario||''});
+      }
+      return [...map.values()].sort((a,b)=>a.rank-b.rank);
+    }
+
+    function aggregateQuarterly_2020_2024(rows, desde, hasta){
+      const out=[];
+      const yMin=Math.max(desde,2020), yMax=Math.min(hasta,2024);
+      const hasTri = rows.some(r => (r.Trimestre??'').toString().trim().length>0);
+      const qOrder = ['Q1','Q2','Q3','Q4'];
+      for(let y=yMin;y<=yMax;y++){
+        if(hasTri){
+          const byQ = groupBy(rows.filter(r=>r.Year===y), r=>String(r.Trimestre||'').toUpperCase());
+          for(const q of qOrder){
+            if(!byQ.has(q)) continue;
+            const items = byQ.get(q).slice().sort((a,b)=>a.Month-b.Month);
+            if(!items.length) continue;
+            const last = items[items.length-1];
+            const reval = items.map(r=>r.Revalorizacion).filter(v=>v!=null).reduce((a,b)=>a+b,0);
+            const commSet = new Set(items.map(r=>(r.Comentario||'').trim()).filter(x=>x.length>0));
+            const comment = [...commSet].join(' • ');
+            const endM = last.Month || qEndMonth(q);
+            out.push({label:`${y}-${q}`, rank: dateRank(y, endM), valor:last.ValorParticipacion, reval: items.length? reval : null, comment});
+          }
+        } else {
+          for(let qi=1; qi<=4; qi++){
+            const endM=qi*3, startM=endM-2;
+            const items=rows.filter(r=>r.Year===y && r.Month>=startM && r.Month<=endM).sort((a,b)=>a.Month-b.Month);
+            if(!items.length) continue;
+            const last=items[items.length-1];
+            const reval = items.map(r=>r.Revalorizacion).filter(v=>v!=null).reduce((a,b)=>a+b,0);
+            const commSet = new Set(items.map(r=>(r.Comentario||'').trim()).filter(x=>x.length>0));
+            const comment = [...commSet].join(' • ');
+            out.push({label:`${y}-Q${qi}`, rank: dateRank(y, endM), valor:last.ValorParticipacion, reval: items.length? reval : null, comment});
+          }
+        }
+      }
+      return out.sort((a,b)=>a.rank-b.rank);
+    }
+
+    function base100Transform(values, baseVal){ if (!baseVal || !Number.isFinite(+baseVal)) return values.map(_=>null); return values.map(v => Number.isFinite(+v) ? (v/baseVal)*100 : null); }
+    function buildSeries(allRows, desde, hasta){
+      const capped = filterMaxDate(allRows).filter(r=>r.Year>=desde && r.Year<=hasta);
+      const spanYears=(hasta-desde+1);
+      const janRow=capped.find(r=>r.Year===desde && r.Month===1) || null;
+      const baseVal=janRow ? janRow.ValorParticipacion : (capped.find(r=>Number.isFinite(+r.ValorParticipacion))?.ValorParticipacion ?? null);
+      let points=[];
+      if(spanYears<=2){ points=aggregateMonthly(capped); }
+      else{ const pre=capped.filter(r=>r.Year<=2024); const post=capped.filter(r=>r.Year>=2025);
+            points=[...aggregateQuarterly_2020_2024(pre,desde,hasta), ...aggregateMonthly(post)].sort((a,b)=>a.rank-b.rank); }
+      if(janRow){
+        const janLabel=`${desde}-01`;
+        if(!points.some(p=>p.label===janLabel)){
+          points.unshift({label:janLabel, rank:dateRank(desde,1), valor:janRow.ValorParticipacion, reval:null, comment:janRow.Comentario||''});
+        }
+      }
+      return { labels: points.map(p=>p.label), valorBase100: base100Transform(points.map(p=>p.valor), baseVal), reval: points.map(p=>p.reval), comments: points.map(p=>p.comment||'') };
+    }
+
+    const commentBoxesPlugin={id:'commentBoxes',afterDatasetsDraw(chart){
+      const comments=chart.options.plugins.commentBoxes?.comments||[]; if(!comments.length) return;
+      const {ctx,scales}=chart; const xScale=scales.x,yLeft=scales.yValor,yRight=scales.yReval; ctx.save();
+      function wrap(text,maxW){
+        const words=(text||'').split(' '); const lines=[]; let line='';
+        for(const w of words){ const test=line?line+' '+w:w; if(ctx.measureText(test).width>maxW){ if(line)lines.push(line); line=w; } else line=test; }
+        if(line)lines.push(line); return lines;
+      }
+      const lineDS=chart.data.datasets.find(d=>d.yAxisID==='yValor'); const barDS=chart.data.datasets.find(d=>d.yAxisID==='yReval');
+      ctx.font='12px system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial';
+      for(let i=0;i<chart.data.labels.length;i++){
+        const t=(comments[i]||'').trim(); if(!t)continue; const x=xScale.getPixelForValue(i);
+        let yA=chart.chartArea.top+20;
+        if(lineDS&&lineDS.data[i]!=null) yA=yLeft.getPixelForValue(lineDS.data[i]);
+        if(barDS&&barDS.data[i]!=null) yA=Math.min(yA,yRight.getPixelForValue(barDS.data[i]));
+        const lines=wrap(t,180),lh=14,widths=lines.map(s=>ctx.measureText(s).width),
+              boxW=Math.min(180,Math.max(...widths,60)+12),boxH=lines.length*lh+12;
+        const gap=10; let boxY=yA-gap-boxH; if(boxY<chart.chartArea.top+4) boxY=chart.chartArea.top+4; const boxX=x-boxW/2;
+        ctx.strokeStyle='rgba(71,85,105,0.6)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,yA); ctx.lineTo(x,boxY+boxH); ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.strokeStyle='rgba(100,116,139,0.8)'; ctx.beginPath(); const r=6;
+        ctx.moveTo(boxX+r,boxY); ctx.lineTo(boxX+boxW-r,boxY); ctx.quadraticCurveTo(boxX+boxW,boxY,boxX+boxW,boxY+r);
+        ctx.lineTo(boxX+boxW,boxY+boxH-r); ctx.quadraticCurveTo(boxX+boxW,boxY+boxH,boxX+boxW-r,boxY+boxH);
+        ctx.lineTo(boxX+r,boxY+boxH); ctx.quadraticCurveTo(boxX,boxY+boxH,boxX,boxY+boxH-r);
+        ctx.lineTo(boxX,boxY+r); ctx.quadraticCurveTo(boxX,boxY,boxX+r,boxY); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillStyle='#0f172a'; for(let li=0;li<lines.length;li++) ctx.fillText(lines[li],boxX+6,boxY+6+(li+1)*lh-3);
+      }
+      ctx.restore();
+    }};
+
+    const STATE={data:[],desde:null,hasta:null,chart:null, showEUR:true, donutChart:null, stacked:null};
+
+    function initYearFilters(){
+      const years=[...new Set(filterMaxDate(STATE.data).map(d=>d.Year))].sort((a,b)=>a-b);
+      const desdeSel=document.getElementById('desdeSelect'), hastaSel=document.getElementById('hastaSelect');
+      if(!years.length){desdeSel.disabled=true;hastaSel.disabled=true;return;}
+      desdeSel.innerHTML='';hastaSel.innerHTML='';
+      years.forEach(y=>{desdeSel.add(new Option(y,y));hastaSel.add(new Option(y,y));});
+      STATE.desde=years[0];STATE.hasta=years[years.length-1];desdeSel.value=STATE.desde;hastaSel.value=STATE.hasta;
+      const onChange=()=>{
+        STATE.desde=+desdeSel.value;STATE.hasta=+hastaSel.value;
+        if(STATE.desde>STATE.hasta){STATE.hasta=STATE.desde;hastaSel.value=STATE.hasta;}
+        if(STATE.hasta<STATE.desde){STATE.desde=STATE.hasta;desdeSel.value=STATE.desde;}
+        updateChart();
+      };
+      desdeSel.addEventListener('change',onChange);hastaSel.addEventListener('change',onChange);
+    }
+
+    function updateChart(){
+      const {labels,valorBase100,reval,comments}=buildSeries(STATE.data,STATE.desde,STATE.hasta);
+      const empty=document.getElementById('emptyState'); if(!labels.length) empty.classList.remove('hidden'); else empty.classList.add('hidden');
+      const ctx=document.getElementById('mixChart').getContext('2d');
+      const lineDS={type:'line',label:'Valor (Base 100)',data:valorBase100,yAxisID:'yValor',borderWidth:2,borderColor:'rgba(59,130,246,0.9)',backgroundColor:'rgba(59,130,246,0.15)',tension:0.25,pointRadius:2,pointHoverRadius:6};
+      const barDS={type:'bar',label:'Revalorización (EUR)',data:reval,yAxisID:'yReval',categoryPercentage:0.55,barPercentage:0.55,maxBarThickness:14,borderWidth:0,
+        backgroundColor:(c)=>{const v=c.raw;if(v==null)return'rgba(148,163,184,0.25)';return v<0?'rgba(239,68,68,0.35)':'rgba(16,185,129,0.35)';},
+        borderColor:(c)=>{const v=c.raw;if(v==null)return'rgba(148,163,184,0.35)';return v<0?'rgba(239,68,68,0.8)':'rgba(16,185,129,0.8)';}};
+
+      const options={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true},
+        title:{display:true,text:' Evolucion de la cartera',color:'#0f172a',font:{weight:'600',size:16}},
+        tooltip:{callbacks:{title:(it)=>it[0].label,label:(it)=>it.dataset.yAxisID==='yValor'?`Valor (Base 100): ${fmtNumber(it.parsed.y)}`:(it.parsed.y==null?'Revalorización: n/d':`Revalorización: ${fmtEUR(it.parsed.y)}`)}},
+        commentBoxes:{comments}},
+        scales:{x:{ticks:{color:'#475569'},grid:{color:'rgba(148,163,184,0.15)'}},
+          yValor:{position:'left',title:{display:true,text:' Valor Cartera',color:'#334155',font:{weight:'600'}},ticks:{color:'#475569',callback:v=>fmtNumber(v)},grid:{color:'rgba(148,163,184,0.15)'}},
+          yReval:{position:'right',title:{display:true,text:'Revalorizacion EUR',color:'#334155',font:{weight:'600'}},ticks:{color:'#475569',callback:v=>fmtEUR(v)},grid:{drawOnChartArea:false}}}
+      };
+
+      if(STATE.chart){STATE.chart.options.plugins.commentBoxes={comments};STATE.chart.data.labels=labels;STATE.chart.data.datasets=[lineDS,barDS];STATE.chart.update();return;}
+      STATE.chart=new Chart(ctx,{plugins:[commentBoxesPlugin],data:{labels,datasets:[lineDS,barDS]},options});
+    }
+
+    function applyEURVisibility(){
+      const show = STATE.showEUR;
+      document.querySelectorAll('.eur-figure').forEach(el => el.classList.toggle('eur-blur', !show));
+      if (STATE.donutChart){
+        STATE.donutChart.options.plugins.tooltip.enabled = show;
+        STATE.donutChart.update();
+      }
+      if (STATE.stacked){
+        STATE.stacked.options.plugins.tooltip.enabled = show;
+        if (STATE.stacked.options.scales && STATE.stacked.options.scales.y){
+          STATE.stacked.options.scales.y.display = show;
+          STATE.stacked.options.scales.y.grid.display = show;
+          if (STATE.stacked.options.scales.y.title) STATE.stacked.options.scales.y.title.display = show;
+        }
+        STATE.stacked.update();
+      }
+      const btn = document.getElementById('btnEuros');
+      const icon = document.getElementById('iconEuros');
+      if (show){
+        btn.classList.remove('bg-slate-200','text-slate-800');
+        btn.classList.add('bg-emerald-600','text-white');
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+      } else {
+        btn.classList.remove('bg-emerald-600','text-white');
+        btn.classList.add('bg-slate-200','text-slate-800');
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
+      }
+    }
+
+    function renderEcTable(){
+      const ec = parseJSON('ec-data');
+      const years = ec.years || [];
+      const cap = ec.capital || [];
+      const capA = ec.capital_acum || [];
+      const plus = ec.plusvalia || [];
+      const plusA = ec.plusvalia_acum || [];
+      const thead = document.getElementById('ec-head-row');
+      const rCap = document.getElementById('ec-row-cap');
+      const rCapA = document.getElementById('ec-row-capA');
+      const rPlus = document.getElementById('ec-row-plus');
+      const rPlusA = document.getElementById('ec-row-plusA');
+      while(thead.children.length>1) thead.removeChild(thead.lastChild);
+      years.forEach(y=>{ const th=document.createElement('th'); th.className='text-right italic font-bold px-2'; th.textContent=y; thead.appendChild(th); });
+      function fill(tr, arr){ while(tr.children.length>1) tr.removeChild(tr.lastChild); arr.forEach(v=>{ const td=document.createElement('td'); td.className='text-right text-slate-700 px-2'; td.innerHTML='<span class="eur-figure">'+fmtEUR(v)+'</span>'; tr.appendChild(td); }); }
+      fill(rCap, cap); fill(rCapA, capA); fill(rPlus, plus); fill(rPlusA, plusA);
+    }
+
+    function renderDonut(){
+      const bd = parseJSON('breakdown-data');
+      const labels=['Letras','Fondos RF','Renta Variable'];
+      const data=[bd.Letras||0, bd.FondosRF||0, bd.RentaVariable||0];
+      const ctx=document.getElementById('donutChart').getContext('2d');
+      STATE.donutChart=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});
+      const box=document.getElementById('breakdownBox');
+      box.innerHTML=labels.map((lbl,i)=>`<div class="flex items-center justify-between"><span class="font-medium">${lbl}</span><span class="eur-figure">${fmtEUR(data[i])}</span></div>`).join('');
+    }
+
+    const RF_MAX_MONTH = 8;
+
+    function parseRF(){ try{ return JSON.parse(document.getElementById('rf-data').textContent.trim()||'{}'); }catch(e){ return {funds:[],rows:[]}; } }
+    function ymLabel(y,m){ return y+'-'+String(m).padStart(2,'0'); }
+    // --- Escalado inteligente de columnas % (por si algún campo viene en fracción 0.0123) ---
+    function buildPctScaler(rf){
+      const funds = (rf.funds||[]).slice();
+      if (!funds.includes('Total')) funds.push('Total');
+      const scale = {};
+      for (const f of funds){
+        const arr = (rf.rows||[]).map(r => r[f+'_PCT']).filter(v => typeof v === 'number' && isFinite(v));
+        if (!arr.length){ scale[f] = false; continue; }
+        const absArr = arr.map(v=>Math.abs(v));
+        const maxA = Math.max(...absArr);
+        const median = absArr.slice().sort((a,b)=>a-b)[Math.floor(absArr.length/2)];
+        // Heurística: si casi todo está por debajo de 1 y el máximo < 5, asumo fracción y escalo x100
+        scale[f] = (median < 1 && maxA < 5);
+      }
+      return (fund, v) => (typeof v === 'number' && isFinite(v) && scale[fund]) ? (v*100) : v;
+    }
+
+    let rfChartInstance=null;
+    function initRFSection(){
+      const rf = parseRF();
+      const select = document.getElementById('rfSelect');
+      const empty = document.getElementById('rfEmpty');
+      if (!rf.rows || !rf.rows.length){
+        empty.classList.remove('hidden');
+      }
+      select.innerHTML='';
+      (rf.funds||[]).forEach(f => select.add(new Option(f,f)));
+      if(select.options.length) select.value = select.options[0].value;
+      select.addEventListener('change', ()=> renderRFChart());
+      renderRFChart();
+      renderRFTable();
+    }
+
+    function renderRFChart(){
+      const rf = parseRF();
+      const fund = document.getElementById('rfSelect').value;
+      const scalePct = buildPctScaler(rf);
+      const rows = (rf.rows||[]).slice().sort((a,b)=>a.Year!==b.Year? a.Year-b.Year : a.Month-b.Month);
+      const labels=[], eur=[], pct=[];
+      rows.forEach(r=>{
+        if (r.Month>RF_MAX_MONTH) return;
+        const e = r[fund+'_EUR']; const pRaw = r[fund+'_PCT'];
+        const p = (pRaw==null? null : scalePct(fund, pRaw));
+        if (e==null && p==null) return;
+        labels.push( ymLabel(r.Year, r.Month) );
+        eur.push( e ?? null );
+        pct.push( p );
+      });
+      const ctx = document.getElementById('rfChart').getContext('2d');
+      const dsBar = {type:'bar', label:'Revalorización (EUR)', data:eur, yAxisID:'yEUR', borderWidth:0,
+        backgroundColor:(c)=>{const v=c.raw; if(v==null) return 'rgba(148,163,184,0.25)'; return v<0?'rgba(239,68,68,0.35)':'rgba(16,185,129,0.35)';},
+        borderColor:(c)=>{const v=c.raw; if(v==null) return 'rgba(148,163,184,0.35)'; return v<0?'rgba(239,68,68,0.8)':'rgba(16,185,129,0.8)';},
+        categoryPercentage:0.6, barPercentage:0.6, maxBarThickness:16};
+      const dsLine = {type:'line', label:'Rentabilidad (%)', data:pct, yAxisID:'yPCT', borderWidth:2, tension:0.25,
+        borderColor:'rgba(59,130,246,0.9)', backgroundColor:'rgba(59,130,246,0.15)', pointRadius:2, pointHoverRadius:5};
+
+      const options = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true},
+        tooltip:{callbacks:{label:(it)=> it.dataset.yAxisID==='yEUR' ? `Revalorización: ${fmtEUR(it.parsed.y)}` : `Rentabilidad: ${fmtFixed(it.parsed.y,2)} %`}},
+        title:{display:true,text:`${fund}: Revalorización EUR (barras) & Rentabilidad % (línea)`, color:'#0f172a', font:{weight:'600'}}},
+        scales:{x:{grid:{color:'rgba(148,163,184,0.15)'}}, yEUR:{position:'left', title:{display:true,text:'Revalorización EUR'}, grid:{color:'rgba(148,163,184,0.15)'}, ticks:{callback:v=>fmtEUR(v)}},
+                yPCT:{position:'right', title:{display:true,text:'Rentabilidad %'}, grid:{drawOnChartArea:false}, ticks:{callback:v=>fmtFixed(v,2)+' %'}}}
+      };
+
+      if (rfChartInstance){ rfChartInstance.data.labels=labels; rfChartInstance.data.datasets=[dsBar, dsLine]; rfChartInstance.options=options; rfChartInstance.update(); }
+      else { rfChartInstance=new Chart(ctx, {data:{labels, datasets:[dsBar, dsLine]}, options}); }
+    }
+
+    function renderRFTable(){
+      const rf = parseRF();
+      const funds = rf.funds||[];
+      const scalePct = buildPctScaler(rf);
+      const rows = (rf.rows||[]).slice().sort((a,b)=>a.Year!==b.Year? a.Year-b.Year : a.Month-b.Month);
+      const head = document.getElementById('rfHead');
+      const body = document.getElementById('rfBody');
+      const comparables = funds.filter(f=>!new Set(['Foncuenta','Total']).has(f));
+      const includeCols = [...comparables];
+      const hasFoncuenta = funds.includes('Foncuenta');
+      const hasTotal = funds.includes('Total');
+      if (hasFoncuenta) includeCols.push('Foncuenta');
+      if (hasTotal) includeCols.push('Total');
+
+      while(head.children.length>1) head.removeChild(head.lastChild);
+      includeCols.forEach(f=>{ const th=document.createElement('th'); th.className='text-right p-2'; th.textContent=f; head.appendChild(th); });
+
+      function colorForTotal(v){
+        // Recalcular min/max sobre valores escalados
+        const totalsScaled = rows.map(r => scalePct('Total', r['Total_PCT'])).filter(v=>Number.isFinite(v));
+        const tMin = totalsScaled.length ? Math.min(...totalsScaled) : 0;
+        const tMax = totalsScaled.length ? Math.max(...totalsScaled) : 0;
+        if (!Number.isFinite(v) || tMax===tMin) return '';
+        const t = (v - tMin) / (tMax - tMin);
+        const r = Math.round(239 - 100*t);
+        const g = Math.round(68  + 117*t);
+        const b = Math.round(68  + 61*t);
+        return `background-color: rgba(${r},${g},${b},0.18); border-color: rgba(${r},${g},${b},0.35);`;
+      }
+
+      function displayPct(v){
+        return Number.isFinite(v) ? (fmtFixed(v, 2) + ' %') : '—';
+      }
+
+      body.innerHTML='';
+      for (const r of rows){
+        if (r.Month>8) continue; // hasta agosto
+        // Escalado para comparables al decidir min/max
+        const vals = comparables.map(f => scalePct(f, r[f+'_PCT'])).filter(v=>Number.isFinite(v));
+        let minV=null, maxV=null;
+        if (vals.length){ minV=Math.min(...vals); maxV=Math.max(...vals); }
+        const tr=document.createElement('tr');
+        const td0=document.createElement('td'); td0.className='p-2 text-slate-600'; td0.textContent=ymLabel(r.Year,r.Month); tr.appendChild(td0);
+        includeCols.forEach(f=>{
+          const vScaled = scalePct(f, r[f+'_PCT']);
+          const td=document.createElement('td'); td.className='p-2 text-right';
+          td.textContent = displayPct(vScaled);
+          if (!new Set(['Foncuenta','Total']).has(f) && Number.isFinite(vScaled)){
+            if (vScaled===maxV) td.classList.add('bg-emerald-50');
+            if (vScaled===minV) td.classList.add('bg-rose-50');
+          }
+          if (f==='Total' && Number.isFinite(vScaled)){
+            td.setAttribute('style', colorForTotal(vScaled));
+          }
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      }
+    }
+
+    function parseEA(){ try{ return JSON.parse(document.getElementById('ea-data').textContent.trim()||'{}'); }catch(e){ return {quarters:[],assets:[],values:{}}; } }
+    function renderActivos(){
+      const ea = parseEA();
+      const quarters = ea.quarters||[];
+      const assetsRaw = ea.assets||[];
+      const values = ea.values||{};
+      const assets = assetsRaw.filter(a => (a||'').toString().trim().toLowerCase() !== 'total');
+
+      const ctx = document.getElementById('stackedActivos').getContext('2d');
+      const datasets = assets.map((a) => ({
+        type:'bar',
+        label:a,
+        data:(values[a]||[]),
+        stack:'totals',
+        borderWidth:1
+      }));
+      const options={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{enabled:true}},
+        scales:{x:{stacked:true}, y:{stacked:true, ticks:{callback:v=>fmtEUR(v)}, title:{display:true, text:'EUR'}}}};
+      if (STATE.stacked){ STATE.stacked.destroy(); }
+      STATE.stacked=new Chart(ctx,{data:{labels:quarters, datasets}, options});
+      applyEURVisibility();
+
+      const head=document.getElementById('activosHead');
+      const body=document.getElementById('activosBody');
+      while(head.children.length>1) head.removeChild(head.lastChild);
+      quarters.forEach(q=>{ const th=document.createElement('th'); th.className='p-2 text-right'; th.textContent=q; head.appendChild(th); });
+      body.innerHTML='';
+      const totals = quarters.map((_,i)=> assets.reduce((acc,a)=> acc + ((values[a]||[])[i]||0), 0 ));
+      assets.forEach(a=>{
+        const tr=document.createElement('tr');
+        const td0=document.createElement('td'); td0.className='p-2 font-medium text-slate-700 border-b border-slate-200'; td0.textContent=a; tr.appendChild(td0);
+        quarters.forEach((q,i)=>{
+          const v = ((values[a]||[])[i]||0);
+          const tot = totals[i]||0;
+          const pct = tot? (v/tot*100) : 0;
+          const td=document.createElement('td'); td.className='p-2 text-right border-b border-slate-200'; td.textContent=fmtNumber(pct,1)+' %';
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+    }
+
+    (function init(){
+      document.getElementById('btnEuros').addEventListener('click', ()=>{ STATE.showEUR = !STATE.showEUR; applyEURVisibility(); });
+      STATE.data = filterMaxDate(parseJSON('vp-data'));
+      initYearFilters();
+      updateChart();
+      const canvas=document.getElementById('mixChart'); const setH=()=>{const h=window.innerWidth<768?320:500;canvas.parentElement.style.height=h+'px';}; setH(); window.addEventListener('resize',setH);
+      renderEcTable();
+      renderDonut();
+      applyEURVisibility();
+      initRFSection();
+      renderActivos();
+    })();
+  </script>
+</body>
+</html>
