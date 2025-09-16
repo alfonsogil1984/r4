@@ -364,22 +364,6 @@
 
     function parseRF(){ try{ return JSON.parse(document.getElementById('rf-data').textContent.trim()||'{}'); }catch(e){ return {funds:[],rows:[]}; } }
     function ymLabel(y,m){ return y+'-'+String(m).padStart(2,'0'); }
-    // --- Escalado inteligente de columnas % (por si algún campo viene en fracción 0.0123) ---
-    function buildPctScaler(rf){
-      const funds = (rf.funds||[]).slice();
-      if (!funds.includes('Total')) funds.push('Total');
-      const scale = {};
-      for (const f of funds){
-        const arr = (rf.rows||[]).map(r => r[f+'_PCT']).filter(v => typeof v === 'number' && isFinite(v));
-        if (!arr.length){ scale[f] = false; continue; }
-        const absArr = arr.map(v=>Math.abs(v));
-        const maxA = Math.max(...absArr);
-        const median = absArr.slice().sort((a,b)=>a-b)[Math.floor(absArr.length/2)];
-        // Heurística: si casi todo está por debajo de 1 y el máximo < 5, asumo fracción y escalo x100
-        scale[f] = (median < 1 && maxA < 5);
-      }
-      return (fund, v) => (typeof v === 'number' && isFinite(v) && scale[fund]) ? (v*100) : v;
-    }
 
     let rfChartInstance=null;
     function initRFSection(){
@@ -400,17 +384,15 @@
     function renderRFChart(){
       const rf = parseRF();
       const fund = document.getElementById('rfSelect').value;
-      const scalePct = buildPctScaler(rf);
       const rows = (rf.rows||[]).slice().sort((a,b)=>a.Year!==b.Year? a.Year-b.Year : a.Month-b.Month);
       const labels=[], eur=[], pct=[];
       rows.forEach(r=>{
         if (r.Month>RF_MAX_MONTH) return;
-        const e = r[fund+'_EUR']; const pRaw = r[fund+'_PCT'];
-        const p = (pRaw==null? null : scalePct(fund, pRaw));
+        const e = r[fund+'_EUR']; const p = r[fund+'_PCT'];
         if (e==null && p==null) return;
         labels.push( ymLabel(r.Year, r.Month) );
         eur.push( e ?? null );
-        pct.push( p );
+        pct.push( p ?? null );
       });
       const ctx = document.getElementById('rfChart').getContext('2d');
       const dsBar = {type:'bar', label:'Revalorización (EUR)', data:eur, yAxisID:'yEUR', borderWidth:0,
@@ -434,7 +416,6 @@
     function renderRFTable(){
       const rf = parseRF();
       const funds = rf.funds||[];
-      const scalePct = buildPctScaler(rf);
       const rows = (rf.rows||[]).slice().sort((a,b)=>a.Year!==b.Year? a.Year-b.Year : a.Month-b.Month);
       const head = document.getElementById('rfHead');
       const body = document.getElementById('rfBody');
@@ -449,10 +430,9 @@
       includeCols.forEach(f=>{ const th=document.createElement('th'); th.className='text-right p-2'; th.textContent=f; head.appendChild(th); });
 
       function colorForTotal(v){
-        // Recalcular min/max sobre valores escalados
-        const totalsScaled = rows.map(r => scalePct('Total', r['Total_PCT'])).filter(v=>Number.isFinite(v));
-        const tMin = totalsScaled.length ? Math.min(...totalsScaled) : 0;
-        const tMax = totalsScaled.length ? Math.max(...totalsScaled) : 0;
+        const totals = rows.map(r => r['Total_PCT']).filter(v=>Number.isFinite(v));
+        const tMin = totals.length ? Math.min(...totals) : 0;
+        const tMax = totals.length ? Math.max(...totals) : 0;
         if (!Number.isFinite(v) || tMax===tMin) return '';
         const t = (v - tMin) / (tMax - tMin);
         const r = Math.round(239 - 100*t);
@@ -468,14 +448,13 @@
       body.innerHTML='';
       for (const r of rows){
         if (r.Month>8) continue; // hasta agosto
-        // Escalado para comparables al decidir min/max
-        const vals = comparables.map(f => scalePct(f, r[f+'_PCT'])).filter(v=>Number.isFinite(v));
+        const vals = comparables.map(f => r[f+'_PCT']).filter(v=>Number.isFinite(v));
         let minV=null, maxV=null;
         if (vals.length){ minV=Math.min(...vals); maxV=Math.max(...vals); }
         const tr=document.createElement('tr');
         const td0=document.createElement('td'); td0.className='p-2 text-slate-600'; td0.textContent=ymLabel(r.Year,r.Month); tr.appendChild(td0);
         includeCols.forEach(f=>{
-          const vScaled = scalePct(f, r[f+'_PCT']);
+          const vScaled = r[f+'_PCT'];
           const td=document.createElement('td'); td.className='p-2 text-right';
           td.textContent = displayPct(vScaled);
           if (!new Set(['Foncuenta','Total']).has(f) && Number.isFinite(vScaled)){
@@ -548,3 +527,4 @@
   </script>
 </body>
 </html>
+
