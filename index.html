@@ -10,11 +10,7 @@
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     .eur-blur { filter: blur(6px); }
     .select-wrap { position: relative; }
-    .select-wrap:after {
-      content: ""; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      border-left: 6px solid transparent; border-right: 6px solid transparent;
-      border-top: 6px solid #334155; pointer-events: none;
-    }
+    .select-wrap:after { content: ""; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #334155; pointer-events: none; }
     table.k-grid th { background-color: #f1f5f9; color:#334155; border-bottom:1px solid #e2e8f0; }
     table.k-grid td { border-bottom:1px dashed #e2e8f0; }
     .eur-figure { transition: filter .2s ease; }
@@ -32,7 +28,6 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-6 space-y-10 md:space-y-14">
-    <!-- BLOQUE 1 -->
     <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8 -mt-6">
       <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
         <div class="grid grid-cols-2 gap-4 md:w-auto">
@@ -55,7 +50,6 @@
       </div>
     </section>
 
-    <!-- BLOQUE 2 -->
     <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
       <h3 class="text-lg md:text-xl font-semibold text-slate-700 mb-4">Evolución del capital (anual)</h3>
       <div class="overflow-x-auto">
@@ -66,39 +60,27 @@
             </tr>
           </thead>
           <tbody class="text-sm">
-            <tr id="ec-row-cap">
-              <td class="font-medium text-slate-700 pr-4">Capital Aportado</td>
-            </tr>
-            <tr id="ec-row-capA">
-              <td class="font-medium text-slate-700 pr-4">Capital acumulado</td>
-            </tr>
-            <tr id="ec-row-plus">
-              <td class="font-medium text-slate-700 pr-4">Plusvalía/Minusvalía</td>
-            </tr>
-            <tr id="ec-row-plusA">
-              <td class="font-medium text-slate-700 pr-4">Plusvalía acumulada</td>
-            </tr>
+            <tr id="ec-row-cap"><td class="font-medium text-slate-700 pr-4">Capital Aportado</td></tr>
+            <tr id="ec-row-capA"><td class="font-medium text-slate-700 pr-4">Capital acumulado</td></tr>
+            <tr id="ec-row-plus"><td class="font-medium text-slate-700 pr-4">Plusvalía/Minusvalía</td></tr>
+            <tr id="ec-row-plusA"><td class="font-medium text-slate-700 pr-4">Plusvalía acumulada</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- BLOQUE 3 -->
     <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg md:text-xl font-semibold text-slate-700">Desglose de rentabilidad</h3>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-center">
-        <div class="md:col-span-2">
-          <canvas id="donutChart" class="w-full h-[280px] md:h-[340px]"></canvas>
-        </div>
+        <div class="md:col-span-2"><canvas id="donutChart" class="w-full h-[280px] md:h-[340px]"></canvas></div>
         <div class="md:col-span-1">
           <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 space-y-2" id="breakdownBox"></div>
         </div>
       </div>
     </section>
 
-    <!-- BLOQUE 4 -->
     <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
       <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
         <div class="select-wrap md:w-64">
@@ -106,54 +88,38 @@
           <select id="rfSelect" class="w-full appearance-none rounded-xl border border-slate-500 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-700 focus:border-slate-700 px-3 py-2"></select>
         </div>
       </div>
-      <div class="relative mb-6">
-        <canvas id="rfChart" class="w-full h-[300px] md:h-[420px]"></canvas>
-      </div>
-      <div id="rfEmpty" class="hidden mt-4 p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-600">
-        No hay datos de <span class="font-medium">ValorFondosRentaFija</span> para mostrar.
-      </div>
-
+      <div class="relative mb-6"><canvas id="rfChart" class="w-full h-[300px] md:h-[420px]"></canvas></div>
+      <div id="rfEmpty" class="hidden mt-4 p-4 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-600">No hay datos de <span class="font-medium">ValorFondosRentaFija</span> para mostrar.</div>
       <h4 class="text-base md:text-lg font-semibold text-slate-700 mt-6 mb-3">Rentabilidad mensual por fondo (%)</h4>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm k-grid" id="rfTable">
-          <thead class="text-slate-600">
-            <tr id="rfHead">
-              <th class="text-left p-2">Periodo</th>
-            </tr>
-          </thead>
+          <thead class="text-slate-600"><tr id="rfHead"><th class="text-left p-2">Periodo</th></tr></thead>
           <tbody id="rfBody" class="text-slate-800"></tbody>
         </table>
       </div>
       <p class="mt-2 text-xs text-slate-500">Nota: verde/rojo resaltan el mejor/peor fondo de cada mes entre comparables (excluye Foncuenta y Total). La columna Total usa una escala cromática sobre su propio histórico.</p>
     </section>
 
-    <!-- BLOQUE 5 -->
     <section class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
       <h3 class="text-lg md:text-xl font-semibold text-slate-700 mb-4">Evolución por activos (trimestral)</h3>
-      <div class="relative mb-6">
-        <canvas id="stackedActivos" class="w-full h-[300px] md:h-[420px]"></canvas>
-      </div>
+      <div class="relative mb-6"><canvas id="stackedActivos" class="w-full h-[300px] md:h-[420px]"></canvas></div>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm k-grid" id="activosTable">
-          <thead>
-            <tr id="activosHead"><th class="p-2 text-left">Activo / Trimestre</th></tr>
-          </thead>
+          <thead><tr id="activosHead"><th class="p-2 text-left">Activo / Trimestre</th></tr></thead>
           <tbody id="activosBody" class="divide-y divide-slate-200"></tbody>
         </table>
       </div>
     </section>
 
-    <footer class="py-10 text-center text-xs text-slate-500">
-      Reporte de cartera — resolución adaptativa (mensual/trimestral), base 100 y análisis anual.
-    </footer>
+    <footer class="py-10 text-center text-xs text-slate-500">Reporte de cartera — resolución adaptativa (mensual/trimestral), base 100 y análisis anual.</footer>
   </main>
 
   <!-- Datos embebidos -->
-  <script type="application/json" id="vp-data">[{"Year": 2020, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 100.204, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": 102.0, "TotalInversion": 50102.0}, {"Year": 2020, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 95.57047342470679, "Comentario": "COVID-19", "CashIn": 50000.0, "Revalorizacion": -4628.809999999998, "TotalInversion": 95473.19}, {"Year": 2020, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 84.49000435555733, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -11069.190000000002, "TotalInversion": 84404.0}, {"Year": 2020, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 85.23776551917044, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 747.0, "TotalInversion": 85151.0}, {"Year": 2020, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 85.54607935905376, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 308.0, "TotalInversion": 85459.0}, {"Year": 2020, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 86.76832351001977, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1221.0, "TotalInversion": 86680.0}, {"Year": 2020, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 86.57012175580907, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -198.0, "TotalInversion": 86482.0}, {"Year": 2020, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 88.29287538710516, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1721.0, "TotalInversion": 88203.0}, {"Year": 2020, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 88.75134207108749, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 458.0, "TotalInversion": 88661.0}, {"Year": 2020, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 87.74031292082076, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -1010.0, "TotalInversion": 87651.0}, {"Year": 2020, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 92.37503070867714, "Comentario": "Vacuna COVID", "CashIn": 0.0, "Revalorizacion": 4630.0, "TotalInversion": 92281.0}, {"Year": 2020, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 94.20489336876386, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1828.0, "TotalInversion": 94109.0}, {"Year": 2021, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 98.14990909272542, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 3941.0, "TotalInversion": 98050.0}, {"Year": 2021, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 97.8781124042429, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": -409.9800000000105, "TotalInversion": 147640.02}, {"Year": 2021, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 98.21418670548074, "Comentario": "", "CashIn": 37000.0, "Revalorizacion": 633.9800000000105, "TotalInversion": 185274.0}, {"Year": 2021, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 98.63296757865955, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 790.0, "TotalInversion": 186064.0}, {"Year": 2021, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 99.21820059636765, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1104.0, "TotalInversion": 187168.0}, {"Year": 2021, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 101.3948009321552, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 4106.0, "TotalInversion": 191274.0}, {"Year": 2021, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 101.582457171529, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 354.0, "TotalInversion": 191628.0}, {"Year": 2021, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 104.27113639781115, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 5072.0, "TotalInversion": 196700.0}, {"Year": 2021, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 104.01615715730608, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -481.0, "TotalInversion": 196219.0}, {"Year": 2021, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 106.28552540803831, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 4281.0, "TotalInversion": 200500.0}, {"Year": 2021, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 104.16511592358867, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -4000.0, "TotalInversion": 196500.0}, {"Year": 2021, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 106.52990260112114, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 4461.0, "TotalInversion": 200961.0}, {"Year": 2022, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 103.84175347721009, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -5071.0, "TotalInversion": 195890.0}, {"Year": 2022, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 99.7740023304316, "Comentario": "Invasion Rusia", "CashIn": 0.0, "Revalorizacion": -7673.5199999999895, "TotalInversion": 188216.48}, {"Year": 2022, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 104.22501749152437, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 8396.51999999999, "TotalInversion": 196613.0}, {"Year": 2022, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 102.935808524979, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2432.0, "TotalInversion": 194181.0}, {"Year": 2022, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 103.19608878919519, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 491.0, "TotalInversion": 194672.0}, {"Year": 2022, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 94.94133466623272, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -15572.0, "TotalInversion": 179100.0}, {"Year": 2022, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 101.90634972027868, "Comentario": "Subida tipos FED", "CashIn": 0.0, "Revalorizacion": 13139.0, "TotalInversion": 192239.0}, {"Year": 2022, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 100.4549294281729, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2738.0, "TotalInversion": 189501.0}, {"Year": 2022, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 92.30725598417516, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -15370.0, "TotalInversion": 174131.0}, {"Year": 2022, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 94.61532170799859, "Comentario": "Continuacion tipos altos", "CashIn": 0.0, "Revalorizacion": 4354.0, "TotalInversion": 178485.0}, {"Year": 2022, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 105.02865268613078, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 19644.0, "TotalInversion": 198129.0}, {"Year": 2022, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 100.8392536472294, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -7903.0, "TotalInversion": 190226.0}, {"Year": 2023, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 101.01099051204069, "Comentario": "", "CashIn": 10000.0, "Revalorizacion": 341.0, "TotalInversion": 200567.0}, {"Year": 2023, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 99.84962625909397, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2306.0, "TotalInversion": 198261.0}, {"Year": 2023, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 93.77286083148981, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -12066.0, "TotalInversion": 186195.0}, {"Year": 2023, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 94.56405911482862, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1571.0, "TotalInversion": 187766.0}, {"Year": 2023, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 94.62838755425952, "Comentario": "", "CashIn": 265000.0, "Revalorizacion": 308.0, "TotalInversion": 453074.0}, {"Year": 2023, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 95.89866537445005, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 6082.0, "TotalInversion": 459156.0}, {"Year": 2023, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 97.99978258443308, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 10060.0, "TotalInversion": 469216.0}, {"Year": 2023, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 95.52439081776123, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -11852.0, "TotalInversion": 457364.0}, {"Year": 2023, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 96.12945409383686, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 2897.0, "TotalInversion": 460261.0}, {"Year": 2023, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 94.29466288885482, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -8784.849999999977, "TotalInversion": 451476.15}, {"Year": 2023, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 97.20855531094728, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 13951.509999999951, "TotalInversion": 465427.66}, {"Year": 2023, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 100.21758281148382, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 14407.01000000001, "TotalInversion": 479834.67}, {"Year": 2024, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 100.19260123797626, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -119.60999999998603, "TotalInversion": 479715.06}, {"Year": 2024, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 99.69206958739014, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2396.5100000000093, "TotalInversion": 477318.55}, {"Year": 2024, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 101.21646137778414, "Comentario": "", "CashIn": 100000.0, "Revalorizacion": 8827.77999999997, "TotalInversion": 586146.3300000001}, {"Year": 2024, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 103.26682979310908, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 11873.720000000088, "TotalInversion": 598020.0500000002}, {"Year": 2024, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 104.95799969209799, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": 10612.429999999935, "TotalInversion": 658632.4800000001}, {"Year": 2024, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 104.85003819947406, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -677.4799999999814, "TotalInversion": 657955.0000000001}, {"Year": 2024, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 105.85861156963534, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 6329.0, "TotalInversion": 664284.0000000001}, {"Year": 2024, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 105.41862562003583, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2761.0, "TotalInversion": 661523.0000000001}, {"Year": 2024, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 106.5374743531536, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 7021.0, "TotalInversion": 668544.0000000001}, {"Year": 2024, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 106.35867731313591, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": -1205.9000000000233, "TotalInversion": 717338.1000000001}, {"Year": 2024, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 108.41915047461015, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 13896.900000000023, "TotalInversion": 731235.0000000001}, {"Year": 2024, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 107.6735079551235, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -5029.0, "TotalInversion": 726206.0000000001}, {"Year": 2025, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 108.71405661325777, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 7018.0, "TotalInversion": 733224.0000000001}, {"Year": 2025, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 108.44314612147434, "Comentario": "", "CashIn": 20000.0, "Revalorizacion": -1877.0, "TotalInversion": 751347.0000000001}, {"Year": 2025, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 107.03366681292844, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -9765.560000000056, "TotalInversion": 741581.4400000001}, {"Year": 2025, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 104.92417923695899, "Comentario": "Aranceles Trump", "CashIn": 21000.0, "Revalorizacion": -15029.439999999944, "TotalInversion": 747552.0000000001}, {"Year": 2025, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 105.92787236562896, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 7151.0, "TotalInversion": 754703.0000000001}, {"Year": 2025, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 106.63653501514017, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 5049.0, "TotalInversion": 759752.0000000001}, {"Year": 2025, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 107.57594611483381, "Comentario": "", "CashIn": 189000.0, "Revalorizacion": 8358.0, "TotalInversion": 957110.0000000001}, {"Year": 2025, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 107.7503856968779, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1552.0, "TotalInversion": 958662.0000000001}, {"Year": 2025, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 107.7503856968779, "Comentario": "", "CashIn": 15000.0, "Revalorizacion": 1998.0, "TotalInversion": 975660.0000000001}]</script>
-  <script type="application/json" id="ec-data">{"years": [2020, 2021, 2022, 2023, 2024, 2025], "capital": [100000.0, 87000.0, 0.0, 275000.0, 200000.0, 245000.0], "capital_acum": [100000.0, 187000.0, 187000.0, 462000.0, 662000.0, 907000.0], "plusvalia": [-5891.0, 19852.0, -10735.0, 14608.669999999984, 46371.330000000016, 4454.0], "plusvalia_acum": [-5891.0, 13961.0, 3226.0, 17834.67, 64206.0, 68660.0]}</script>
+  <script type="application/json" id="vp-data">[{"Year": 2020, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 100.204, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": 102.0, "TotalInversion": 50102.0}, {"Year": 2020, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 95.57047342470679, "Comentario": "COVID-19", "CashIn": 50000.0, "Revalorizacion": -4628.809999999998, "TotalInversion": 95473.19}, {"Year": 2020, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 84.49000435555733, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -11069.190000000002, "TotalInversion": 84404.0}, {"Year": 2020, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 85.23776551917044, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 747.0, "TotalInversion": 85151.0}, {"Year": 2020, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 85.54607935905376, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 308.0, "TotalInversion": 85459.0}, {"Year": 2020, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 86.76832351001977, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1221.0, "TotalInversion": 86680.0}, {"Year": 2020, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 86.57012175580907, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -198.0, "TotalInversion": 86482.0}, {"Year": 2020, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 88.29287538710516, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1721.0, "TotalInversion": 88203.0}, {"Year": 2020, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 88.75134207108749, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 458.0, "TotalInversion": 88661.0}, {"Year": 2020, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 87.74031292082076, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -1010.0, "TotalInversion": 87651.0}, {"Year": 2020, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 92.37503070867714, "Comentario": "Vacuna COVID", "CashIn": 0.0, "Revalorizacion": 4630.0, "TotalInversion": 92281.0}, {"Year": 2020, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 94.20489336876386, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1828.0, "TotalInversion": 94109.0}, {"Year": 2021, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 98.14990909272542, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 3941.0, "TotalInversion": 98050.0}, {"Year": 2021, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 97.8781124042429, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": -409.9800000000105, "TotalInversion": 147640.02}, {"Year": 2021, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 98.21418670548074, "Comentario": "", "CashIn": 37000.0, "Revalorizacion": 633.9800000000105, "TotalInversion": 185274.0}, {"Year": 2021, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 98.63296757865955, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 790.0, "TotalInversion": 186064.0}, {"Year": 2021, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 99.21820059636765, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1104.0, "TotalInversion": 187168.0}, {"Year": 2021, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 101.3948009321552, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 4106.0, "TotalInversion": 191274.0}, {"Year": 2021, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 101.582457171529, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 354.0, "TotalInversion": 191628.0}, {"Year": 2021, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 104.27113639781115, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 5072.0, "TotalInversion": 196700.0}, {"Year": 2021, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 104.01615715730608, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -481.0, "TotalInversion": 196219.0}, {"Year": 2021, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 106.28552540803831, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 4281.0, "TotalInversion": 200500.0}, {"Year": 2021, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 104.16511592358867, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -4000.0, "TotalInversion": 196500.0}, {"Year": 2021, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 106.52990260112114, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 4461.0, "TotalInversion": 200961.0}, {"Year": 2022, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 103.84175347721009, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -5071.0, "TotalInversion": 195890.0}, {"Year": 2022, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 99.7740023304316, "Comentario": "Invasion Rusia", "CashIn": 0.0, "Revalorizacion": -7673.5199999999895, "TotalInversion": 188216.48}, {"Year": 2022, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 104.22501749152437, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 8396.51999999999, "TotalInversion": 196613.0}, {"Year": 2022, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 102.935808524979, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2432.0, "TotalInversion": 194181.0}, {"Year": 2022, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 103.19608878919519, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 491.0, "TotalInversion": 194672.0}, {"Year": 2022, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 94.94133466623272, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -15572.0, "TotalInversion": 179100.0}, {"Year": 2022, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 101.90634972027868, "Comentario": "Subida tipos FED", "CashIn": 0.0, "Revalorizacion": 13139.0, "TotalInversion": 192239.0}, {"Year": 2022, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 100.4549294281729, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2738.0, "TotalInversion": 189501.0}, {"Year": 2022, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 92.30725598417516, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -15370.0, "TotalInversion": 174131.0}, {"Year": 2022, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 94.61532170799859, "Comentario": "Continuacion tipos altos", "CashIn": 0.0, "Revalorizacion": 4354.0, "TotalInversion": 178485.0}, {"Year": 2022, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 99.45639745700747, "Comentario": "", "CashIn": 10000.0, "Revalorizacion": 19644.0, "TotalInversion": 198129.0}, {"Year": 2022, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 95.48926539101647, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -7903.0, "TotalInversion": 190226.0}, {"Year": 2023, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 100.68021980002734, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 341.0, "TotalInversion": 200567.0}, {"Year": 2023, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 99.52265855187154, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2306.0, "TotalInversion": 198261.0}, {"Year": 2023, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 93.46579210770511, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -12066.0, "TotalInversion": 186195.0}, {"Year": 2023, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 94.25439953218593, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1571.0, "TotalInversion": 187766.0}, {"Year": 2023, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 93.2883128359153, "Comentario": "", "CashIn": 270000.0, "Revalorizacion": 308.0, "TotalInversion": 453074.0}, {"Year": 2023, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 94.54060168645194, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 6082.0, "TotalInversion": 459156.0}, {"Year": 2023, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 96.61196404034845, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 10060.0, "TotalInversion": 469216.0}, {"Year": 2023, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 94.17162739836222, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -11852.0, "TotalInversion": 457364.0}, {"Year": 2023, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 94.7681221040519, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 2897.0, "TotalInversion": 460261.0}, {"Year": 2023, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 92.95931419404914, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -8784.849999999977, "TotalInversion": 451476.15}, {"Year": 2023, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 95.8319416884836, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 13951.509999999951, "TotalInversion": 465427.66}, {"Year": 2023, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 98.79835701116855, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 14407.01000000001, "TotalInversion": 479834.67}, {"Year": 2024, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 98.77372921284355, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -119.60999999998603, "TotalInversion": 479715.06}, {"Year": 2024, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 98.28028581376437, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2396.5100000000093, "TotalInversion": 477318.55}, {"Year": 2024, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 99.783090013458, "Comentario": "", "CashIn": 100000.0, "Revalorizacion": 8827.77999999997, "TotalInversion": 586146.33}, {"Year": 2024, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 101.80442224896751, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 11873.720000000088, "TotalInversion": 598020.05}, {"Year": 2024, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 103.47164273822183, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": 10612.429999999935, "TotalInversion": 658632.48}, {"Year": 2024, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 103.36521013635213, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -677.4799999999814, "TotalInversion": 657955.0}, {"Year": 2024, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 104.35950065006959, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 6329.0, "TotalInversion": 664284.0}, {"Year": 2024, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 103.92574553735449, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -2761.0, "TotalInversion": 661523.0}, {"Year": 2024, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 105.02874975552645, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 7021.0, "TotalInversion": 668544.0}, {"Year": 2024, "Month": 10, "Trimestre": "Q4", "ValorParticipacion": 104.85248473998085, "Comentario": "", "CashIn": 50000.0, "Revalorizacion": -1205.9000000000233, "TotalInversion": 717338.1}, {"Year": 2024, "Month": 11, "Trimestre": "Q4", "ValorParticipacion": 106.8837786238315, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 13896.900000000023, "TotalInversion": 731235.0}, {"Year": 2024, "Month": 12, "Trimestre": "Q4", "ValorParticipacion": 106.14869547997317, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -5029.0, "TotalInversion": 726206.0}, {"Year": 2025, "Month": 1, "Trimestre": "Q1", "ValorParticipacion": 107.17450846537739, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 7018.0, "TotalInversion": 733224.0}, {"Year": 2025, "Month": 2, "Trimestre": "Q1", "ValorParticipacion": 106.9074344576592, "Comentario": "", "CashIn": 20000.0, "Revalorizacion": -1877.0, "TotalInversion": 751347.0}, {"Year": 2025, "Month": 3, "Trimestre": "Q1", "ValorParticipacion": 105.51791541300695, "Comentario": "", "CashIn": 0.0, "Revalorizacion": -9765.560000000056, "TotalInversion": 741581.44}, {"Year": 2025, "Month": 4, "Trimestre": "Q2", "ValorParticipacion": 103.43830122960267, "Comentario": "Aranceles Trump", "CashIn": 21000.0, "Revalorizacion": -15029.439999999944, "TotalInversion": 747552.0}, {"Year": 2025, "Month": 5, "Trimestre": "Q2", "ValorParticipacion": 104.42778061310092, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 7151.0, "TotalInversion": 754703.0}, {"Year": 2025, "Month": 6, "Trimestre": "Q2", "ValorParticipacion": 105.12640757538351, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 5049.0, "TotalInversion": 759752.0}, {"Year": 2025, "Month": 7, "Trimestre": "Q3", "ValorParticipacion": 106.05251525633179, "Comentario": "", "CashIn": 189000.0, "Revalorizacion": 8358.0, "TotalInversion": 957110.0}, {"Year": 2025, "Month": 8, "Trimestre": "Q3", "ValorParticipacion": 106.2244845218058, "Comentario": "", "CashIn": 0.0, "Revalorizacion": 1552.0, "TotalInversion": 958662.0}, {"Year": 2025, "Month": 9, "Trimestre": "Q3", "ValorParticipacion": 106.44246213629067, "Comentario": "", "CashIn": 15000.0, "Revalorizacion": 1998.0, "TotalInversion": 975660.0}]</script>
+  <script type="application/json" id="ec-data">{"years": [2020, 2021, 2022, 2023, 2024, 2025], "capital": [100000.0, 87000.0, 10000.0, 270000.0, 200000.0, 245000.0], "capital_acum": [100000.0, 187000.0, 197000.0, 467000.0, 667000.0, 912000.0], "plusvalia": [-5891.0, 19852.0, -20735.0, 19608.669999999984, 46371.330000000016, 4454.0], "plusvalia_acum": [-5891.0, 13961.0, -6774.0, 12834.67, 59206.0, 63660.0]}</script>
   <script type="application/json" id="breakdown-data">{"Letras": 13960.31, "FondosRF": 17741.0, "RentaVariable": 36958.69}</script>
   <script type="application/json" id="rf-data">{"funds": ["Evli Renta Fija", "Foncuenta", "R4 FIJA 6M", "R4 Fija Clase A", "R4 Fija Clase R"], "rows": [{"Year": 2024, "Month": 4, "R4 FIJA 6M_EUR": 318.42090047799866, "R4 FIJA 6M_PCT": 0.3182579564489099}, {"Year": 2024, "Month": 5, "R4 FIJA 6M_EUR": 385.6568574379853, "R4 FIJA 6M_PCT": 0.2397555564614074}, {"Year": 2024, "Month": 6, "R4 FIJA 6M_EUR": 469.656676685001, "R4 FIJA 6M_PCT": 0.2912782956058595}, {"Year": 2024, "Month": 7, "R4 FIJA 6M_EUR": 590.4255364040146, "R4 FIJA 6M_PCT": 0.3651149282217334}, {"Year": 2024, "Month": 8, "R4 FIJA 6M_EUR": 496.4942010669911, "R4 FIJA 6M_PCT": 0.3059115336916026}, {"Year": 2024, "Month": 9, "R4 FIJA 6M_EUR": 577.0067742130195, "R4 FIJA 6M_PCT": 0.3544345532476217}, {"Year": 2024, "Month": 10, "R4 FIJA 6M_EUR": 815.9563376399456, "R4 FIJA 6M_PCT": 0.30864050865532, "R4 Fija Clase A_EUR": 403.3375700000033, "R4 Fija Clase A_PCT": 0.20166878500000165, "R4 Fija Clase R_EUR": 56.29862000000139, "R4 Fija Clase R_PCT": 0.1876620666666713}, {"Year": 2024, "Month": 11, "R4 FIJA 6M_EUR": 694.7184701120132, "R4 FIJA 6M_PCT": 0.2619729840360263, "R4 Fija Clase A_EUR": 595.2181500000006, "R4 Fija Clase A_PCT": 0.29701009834334396, "R4 Fija Clase R_EUR": 164.9771499999988, "R4 Fija Clase R_PCT": 0.5488937679446}, {"Year": 2024, "Month": 12, "R4 FIJA 6M_EUR": 564.4587569659925, "R4 FIJA 6M_PCT": 0.2122968890340464, "R4 Fija Clase A_EUR": 555.5369399999909, "R4 Fija Clase A_PCT": 0.27638852329559954, "R4 Fija Clase R_EUR": 50.76220000000103, "R4 Fija Clase R_PCT": 0.1679684219366793}, {"Year": 2025, "Month": 1, "R4 FIJA 6M_EUR": 824.9781832580338, "R4 FIJA 6M_PCT": 0.3096227491241063, "R4 Fija Clase A_EUR": 581.9910800000071, "R4 Fija Clase A_PCT": 0.2887518046987829, "R4 Fija Clase R_EUR": 91.37195999999676, "R4 Fija Clase R_PCT": 0.3018361700343651}, {"Year": 2025, "Month": 2, "R4 FIJA 6M_EUR": 564.4587569659925, "R4 FIJA 6M_PCT": 0.2111932418162591, "R4 Fija Clase A_EUR": 515.8557299999811, "R4 Fija Clase A_PCT": 0.25520219866508687, "R4 Fija Clase R_EUR": 141.27742999999828, "R4 Fija Clase R_PCT": 0.2805160139004875}, {"Year": 2025, "Month": 3, "R4 FIJA 6M_EUR": 564.4587569659925, "R4 FIJA 6M_PCT": 0.2107481559536326, "R4 Fija Clase A_EUR": 515.8557300000102, "R4 Fija Clase A_PCT": 0.254552574897205, "R4 Fija Clase R_EUR": 21.029600000001665, "R4 Fija Clase R_PCT": 0.04163890739507325}, {"Year": 2025, "Month": 4, "R4 FIJA 6M_EUR": 586.1687091570348, "R4 FIJA 6M_PCT": 0.21839359378792852, "R4 Fija Clase A_EUR": 396.8121000000101, "R4 Fija Clase A_PCT": 0.195312500000005, "R4 Fija Clase R_EUR": 193.47232000000076, "R4 Fija Clase R_PCT": 0.38291850495296914}, {"Year": 2025, "Month": 5, "R4 FIJA 6M_EUR": 607.8786613479606, "R4 FIJA 6M_PCT": 0.2259887005649571, "R4 Fija Clase A_EUR": 515.8557300000102, "R4 Fija Clase A_PCT": 0.25341130604288997, "R4 Fija Clase R_EUR": 164.0308800000057, "R4 Fija Clase R_PCT": 0.32340990131852854}, {"Year": 2025, "Month": 6, "R4 FIJA 6M_EUR": 586.1687091570348, "R4 FIJA 6M_PCT": 0.21742631663715256, "R4 Fija Clase A_EUR": 581.991079999978, "R4 Fija Clase A_PCT": 0.28517726359451895, "R4 Fija Clase R_EUR": 151.41311999999743, "R4 Fija Clase R_PCT": 0.29756984625557437}, {"Year": 2025, "Month": 7, "R4 FIJA 6M_EUR": 611.8015330050257, "R4 FIJA 6M_PCT": 0.19108028441424885, "R4 Fija Clase A_EUR": 628.9347700000217, "R4 Fija Clase A_PCT": 0.25191403819291, "R4 Fija Clase R_EUR": 247.48697999997967, "R4 Fija Clase R_PCT": 0.21420496259313376, "Evli Renta Fija_EUR": 28.766459999998915, "Evli Renta Fija_PCT": 0.09588819999999638}, {"Year": 2025, "Month": 8, "R4 FIJA 6M_EUR": 529.8948300000047, "R4 FIJA 6M_PCT": 0.16518322508219216, "R4 Fija Clase A_EUR": 525.8764680000022, "R4 Fija Clase A_PCT": 0.21010569734467732, "R4 Fija Clase R_EUR": 171.20916000001307, "R4 Fija Clase R_PCT": 0.14786823297462726, "Evli Renta Fija_EUR": 68.19391999999789, "Evli Renta Fija_PCT": 0.22709530906251515}, {"Year": 2025, "Month": 9, "R4 FIJA 6M_EUR": 0.0, "R4 FIJA 6M_PCT": 0.0, "R4 Fija Clase A_EUR": 0.0, "R4 Fija Clase A_PCT": 0.0, "R4 Fija Clase R_EUR": 0.0, "R4 Fija Clase R_PCT": 0.0, "Evli Renta Fija_EUR": 0.0, "Evli Renta Fija_PCT": 0.0, "Foncuenta_EUR": 0.0, "Foncuenta_PCT": 0.0}]}</script>
-  <script type="application/json" id="ea-data">{"quarters": ["2023-Q3", "2023-Q4", "2024-Q1", "2024-Q2", "2024-Q3", "2024-Q4", "2025-Q1", "2025-Q2", "2025-Q3"], "assets": ["Bolsa", "Cash/Foncuenta", "Fondo RV", "Fondo RF"], "values": {"Bolsa": [82519.0, 92445.0, 90134.25, 105978.0, 108924.0, 126716.0, 127888.0, 139608.0, 116251.0], "Cash/Foncuenta": [2635.0, 1122.21, 4623.0, 2900.0, 15998.0, 3890.0, 791.79, 1116.0, 36033.0], "Fondo RV": [102309.0, 108053.0, 111919.23000000001, 105112.0, 95299.0, 97323.0, 90809.0, 93118.0, 134548.0],"Fondo RF": [272795.0, 278214.0, 379470.0, 443964.0, 448322.0, 498277.0, 522092.0, 525870.0, 688854.0]}}</script>
+  <script type="application/json" id="ea-data">{"quarters": ["2023-Q3", "2023-Q4", "2024-Q1", "2024-Q2", "2024-Q3", "2024-Q4", "2025-Q1", "2025-Q2", "2025-Q3"], "assets": ["Bolsa", "Cash/Foncuenta", "Fondo RV", "Fondos RF"], "values": {"Bolsa": [82519.0, 92445.0, 90134.25, 105978.0, 108924.0, 126716.0, 127888.0, 139608.0, 116251.0], "Cash/Foncuenta": [2635.0, 1122.21, 4623.0, 2900.0, 15998.0, 3890.0, 791.79, 1116.0, 36033.0], "Fondo RV": [102309.0, 108053.0, 111919.23000000001, 105112.0, 95299.0, 97323.0, 90809.0, 93118.0, 134548.0], "Fondos RF": [272795.0, 278214.0, 379469.6, 443964.0, 448322.0, 498277.0, 522092.0, 525870.0, 688854.1799999999]}}</script>
 
   <script>
     const MAX_YEAR=2025, MAX_MONTH=9;
@@ -161,7 +127,6 @@
     const fmtNumber=(n,maxFrac=2)=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:maxFrac}).format(n);
     const fmtEUR=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
     const fmtFixed=(n,fd=2)=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:fd,maximumFractionDigits:fd}).format(n);
-    const fmtPct2=(n)=> (Number.isFinite(n)? (new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n)+' %') : '—');
     const dateRank=(y,m)=>new Date(y,m-1,28).getTime();
     const qEndMonth = q => (q==='Q1'?3:(q==='Q2'?6:(q==='Q3'?9:12)));
 
@@ -174,7 +139,6 @@
       for(const r of rows){
         const key=`${r.Year}-${monthToLabel(r.Month)}`;
         const rank=dateRank(r.Year,r.Month);
-        the_prev=map.get(key);
         const prev=map.get(key);
         if(!prev||rank>=prev.rank) map.set(key,{label:key,rank,valor:r.ValorParticipacion,reval:r.Revalorizacion,comment:r.Comentario||''});
       }
@@ -305,10 +269,7 @@
     function applyEURVisibility(){
       const show = STATE.showEUR;
       document.querySelectorAll('.eur-figure').forEach(el => el.classList.toggle('eur-blur', !show));
-      if (STATE.donutChart){
-        STATE.donutChart.options.plugins.tooltip.enabled = show;
-        STATE.donutChart.update();
-      }
+      if (STATE.donutChart){ STATE.donutChart.options.plugins.tooltip.enabled = show; STATE.donutChart.update(); }
       if (STATE.stacked){
         STATE.stacked.options.plugins.tooltip.enabled = show;
         if (STATE.stacked.options.scales && STATE.stacked.options.scales.y){
@@ -320,15 +281,10 @@
       }
       const btn = document.getElementById('btnEuros');
       const icon = document.getElementById('iconEuros');
-      if (show){
-        btn.classList.remove('bg-slate-200','text-slate-800');
-        btn.classList.add('bg-emerald-600','text-white');
+      if (show){ btn.classList.remove('bg-slate-200','text-slate-800'); btn.classList.add('bg-emerald-600','text-white');
         icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
-      } else {
-        btn.classList.remove('bg-emerald-600','text-white');
-        btn.classList.add('bg-slate-200','text-slate-800');
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>';
-      }
+      } else { btn.classList.remove('bg-emerald-600','text-white'); btn.classList.add('bg-slate-200','text-slate-800');
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>'; }
     }
 
     function renderEcTable(){
@@ -367,15 +323,11 @@
       const rf = parseRF();
       const select = document.getElementById('rfSelect');
       const empty = document.getElementById('rfEmpty');
-      if (!rf.rows || !rf.rows.length){
-        empty.classList.remove('hidden');
-      }
-      select.innerHTML='';
-      (rf.funds||[]).forEach(f => select.add(new Option(f,f)));
+      if (!rf.rows || !rf.rows.length){ empty.classList.remove('hidden'); }
+      select.innerHTML=''; (rf.funds||[]).forEach(f => select.add(new Option(f,f)));
       if(select.options.length) select.value = select.options[0].value;
       select.addEventListener('change', ()=> renderRFChart());
-      renderRFChart();
-      renderRFTable();
+      renderRFChart(); renderRFTable();
     }
 
     function renderRFChart(){
@@ -397,14 +349,12 @@
         categoryPercentage:0.6, barPercentage:0.6, maxBarThickness:16};
       const dsLine = {type:'line', label:'Rentabilidad (%)', data:pct, yAxisID:'yPCT', borderWidth:2, tension:0.25,
         borderColor:'rgba(59,130,246,0.9)', backgroundColor:'rgba(59,130,246,0.15)', pointRadius:2, pointHoverRadius:5};
-
       const options = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true},
         tooltip:{callbacks:{label:(it)=> it.dataset.yAxisID==='yEUR' ? `Revalorización: ${fmtEUR(it.parsed.y)}` : `Rentabilidad: ${fmtFixed(it.parsed.y,2)} %`}},
         title:{display:true,text:`${fund}: Revalorización EUR (barras) & Rentabilidad % (línea)`, color:'#0f172a', font:{weight:'600'}}},
         scales:{x:{grid:{color:'rgba(148,163,184,0.15)'}}, yEUR:{position:'left', title:{display:true,text:'Revalorización EUR'}, grid:{color:'rgba(148,163,184,0.15)'}, ticks:{callback:v=>fmtEUR(v)}},
                 yPCT:{position:'right', title:{display:true,text:'Rentabilidad %'}, grid:{drawOnChartArea:false}, ticks:{callback:v=>fmtFixed(v,2)+' %'}}}
       };
-
       if (rfChartInstance){ rfChartInstance.data.labels=labels; rfChartInstance.data.datasets=[dsBar, dsLine]; rfChartInstance.options=options; rfChartInstance.update(); }
       else { rfChartInstance=new Chart(ctx, {data:{labels, datasets:[dsBar, dsLine]}, options}); }
     }
@@ -437,9 +387,7 @@
         return `background-color: rgba(${r},${g},${b},0.18); border-color: rgba(${r},${g},${b},0.35);`;
       }
 
-      function displayPct(v){
-        return Number.isFinite(v) ? (fmtFixed(v, 2) + ' %') : '—';
-      }
+      function displayPct(v){ return Number.isFinite(v) ? (fmtFixed(v, 2) + ' %') : '—'; }
 
       body.innerHTML='';
       for (const r of rows){
@@ -456,9 +404,7 @@
             if (vScaled===maxV) td.classList.add('bg-emerald-50');
             if (vScaled===minV) td.classList.add('bg-rose-50');
           }
-          if (f==='Total' && Number.isFinite(vScaled)){
-            td.setAttribute('style', colorForTotal(vScaled));
-          }
+          if (f==='Total' && Number.isFinite(vScaled)){ td.setAttribute('style', colorForTotal(vScaled)); }
           tr.appendChild(td);
         });
         body.appendChild(tr);
@@ -474,9 +420,7 @@
       const assets = assetsRaw.filter(a => (a||'').toString().trim().toLowerCase() !== 'total');
 
       const ctx = document.getElementById('stackedActivos').getContext('2d');
-      const datasets = assets.map((a) => ({
-        type:'bar', label:a, data:(values[a]||[]), stack:'totals', borderWidth:1
-      }));
+      const datasets = assets.map((a) => ({ type:'bar', label:a, data:(values[a]||[]), stack:'totals', borderWidth:1 }));
       const options={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{enabled:true}},
         scales:{x:{stacked:true}, y:{stacked:true, ticks:{callback:v=>fmtEUR(v)}, title:{display:true, text:'EUR'}}}};
       if (STATE.stacked){ STATE.stacked.destroy(); }
@@ -518,5 +462,6 @@
   </script>
 </body>
 </html>
+
 
 
