@@ -453,7 +453,7 @@
       else { rfChartInstance=new Chart(ctx, {data:{labels, datasets:[dsBar, dsLine]}, options}); }
     }
 
-  function renderRFTable(){
+function renderRFTable(){
   const rf = parseRF();
   const funds = rf.funds || [];
   const rows = (rf.rows || []).slice().sort((a,b)=> a.Year!==b.Year ? a.Year-b.Year : a.Month-b.Month);
@@ -462,12 +462,12 @@
   const body = document.getElementById('rfBody');
 
   // 1) Columnas: todos los fondos menos "R4 Total"
-  const comparables = funds.filter(f => f !== 'R4 Total'); // ← Foncuenta SÍ entra aquí
-  // 2) y "R4 Total" al final
+  const comparables = funds.filter(f => f !== 'R4 Total'); // Foncuenta y B&H Corporativo sí están aquí
+  // 2) y "R4 Total" al final (si existe)
   const includeCols = [...comparables];
   if (funds.includes('R4 Total')) includeCols.push('R4 Total');
 
-  // 3) Cabecera de la tabla
+  // 3) Cabecera
   while (head.children.length > 1) head.removeChild(head.lastChild);
   includeCols.forEach(f => {
     const th = document.createElement('th');
@@ -476,7 +476,8 @@
     head.appendChild(th);
   });
 
-  // 4) Escala cromática propia para "R4 Total"
+  // 4) Helpers
+  function displayPct(v){ return Number.isFinite(v) ? (fmtFixed(v,2) + ' %') : '—'; }
   function colorForTotal(v){
     const totals = rows.map(r => r['R4 Total_PCT']).filter(v => Number.isFinite(v));
     const tMin = totals.length ? Math.min(...totals) : 0;
@@ -488,12 +489,11 @@
     const b = Math.round(68  + 61*t);
     return `background-color: rgba(${r},${g},${b},0.18); border-color: rgba(${r},${g},${b},0.35);`;
   }
-  function displayPct(v){ return Number.isFinite(v) ? (fmtFixed(v,2) + ' %') : '—'; }
 
-  // 5) Cuerpo de la tabla
+  // 5) Cuerpo
   body.innerHTML = '';
   for (const r of rows){
-    // Mejor/peor del mes entre comparables (incluye Foncuenta; excluye "R4 Total")
+    // Mejor/peor del mes entre comparables (incluye Foncuenta y B&H; excluye "R4 Total")
     const vals = comparables.map(f => r[f+'_PCT']).filter(v => Number.isFinite(v));
     let minV = null, maxV = null;
     if (vals.length){ minV = Math.min(...vals); maxV = Math.max(...vals); }
@@ -510,7 +510,7 @@
       td.className = 'p-2 text-right';
       td.textContent = displayPct(vScaled);
 
-      // Verde/rojo para TODOS los comparables (incl. Foncuenta), NO para "R4 Total"
+      // Verde/rojo para comparables (no para "R4 Total")
       if (f !== 'R4 Total' && Number.isFinite(vScaled)){
         if (vScaled === maxV) td.classList.add('bg-emerald-50');
         if (vScaled === minV) td.classList.add('bg-rose-50');
@@ -526,30 +526,6 @@
     body.appendChild(tr);
   }
 }
-
-      function displayPct(v){ return Number.isFinite(v) ? (fmtFixed(v, 2) + ' %') : '—'; }
-
-      body.innerHTML='';
-      for (const r of rows){
-        const vals = comparables.map(f => r[f+'_PCT']).filter(v=>Number.isFinite(v));
-        let minV=null, maxV=null;
-        if (vals.length){ minV=Math.min(...vals); maxV=Math.max(...vals); }
-        const tr=document.createElement('tr');
-        const td0=document.createElement('td'); td0.className='p-2 text-slate-600'; td0.textContent=ymLabel(r.Year,r.Month); tr.appendChild(td0);
-        includeCols.forEach(f=>{
-          const vScaled = r[f+'_PCT'];
-          const td=document.createElement('td'); td.className='p-2 text-right';
-          td.textContent = displayPct(vScaled);
-          if (f !== 'R4 Total' && Number.isFinite(vScaled)){
-          if (vScaled === maxV) td.classList.add('bg-emerald-50');
-          if (vScaled === minV) td.classList.add('bg-rose-50');
-          }
-          if (f==='Total' && Number.isFinite(vScaled)){ td.setAttribute('style', colorForTotal(vScaled)); }
-          tr.appendChild(td);
-        });
-        body.appendChild(tr);
-      }
-    }
 
     function parseEA(){ try{ return JSON.parse(document.getElementById('ea-data').textContent.trim()||'{}'); }catch(e){ return {quarters:[],assets:[],values:{}}; } }
     function renderActivos(){
