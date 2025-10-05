@@ -465,7 +465,7 @@
       const hasR4Total   = funds.includes('R4 Total');
       
       // Saca “R4 Total” del grupo de comparables para que NO se use en el min/max
-      const comparables = funds.filter(f => !['Foncuenta','Total','R4 Total'].includes(f));
+      const comparables = funds.filter(f => f !== 'R4 Total');
       
       // Orden final de columnas en la tabla:
       const includeCols = [...comparables];
@@ -502,9 +502,9 @@
           const vScaled = r[f+'_PCT'];
           const td=document.createElement('td'); td.className='p-2 text-right';
           td.textContent = displayPct(vScaled);
-          if (!new Set(['Foncuenta','Total']).has(f) && Number.isFinite(vScaled)){
-            if (vScaled===maxV) td.classList.add('bg-emerald-50');
-            if (vScaled===minV) td.classList.add('bg-rose-50');
+          if (f !== 'R4 Total' && Number.isFinite(vScaled)){
+          if (vScaled === maxV) td.classList.add('bg-emerald-50');
+          if (vScaled === minV) td.classList.add('bg-rose-50');
           }
           if (f==='Total' && Number.isFinite(vScaled)){ td.setAttribute('style', colorForTotal(vScaled)); }
           tr.appendChild(td);
