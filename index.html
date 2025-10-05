@@ -459,12 +459,20 @@
       const rows = (rf.rows||[]).slice().sort((a,b)=>a.Year!==b.Year? a.Year-b.Year : a.Month-b.Month);
       const head = document.getElementById('rfHead');
       const body = document.getElementById('rfBody');
-      const comparables = funds.filter(f=>!new Set(['Foncuenta','Total']).has(f));
-      const includeCols = [...comparables];
+  
       const hasFoncuenta = funds.includes('Foncuenta');
-      const hasTotal = funds.includes('Total');
+      const hasTotal     = funds.includes('Total');
+      const hasR4Total   = funds.includes('R4 Total');
+      
+      // Saca “R4 Total” del grupo de comparables para que NO se use en el min/max
+      const comparables = funds.filter(f => !['Foncuenta','Total','R4 Total'].includes(f));
+      
+      // Orden final de columnas en la tabla:
+      const includeCols = [...comparables];
       if (hasFoncuenta) includeCols.push('Foncuenta');
-      if (hasTotal) includeCols.push('Total');
+      if (hasTotal)     includeCols.push('Total');
+      // “R4 Total” SIEMPRE la última columna
+      if (hasR4Total)   includeCols.push('R4 Total');
 
       while(head.children.length>1) head.removeChild(head.lastChild);
       includeCols.forEach(f=>{ const th=document.createElement('th'); th.className='text-right p-2'; th.textContent=f; head.appendChild(th); });
