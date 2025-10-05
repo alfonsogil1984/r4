@@ -453,41 +453,79 @@
       else { rfChartInstance=new Chart(ctx, {data:{labels, datasets:[dsBar, dsLine]}, options}); }
     }
 
-    function renderRFTable(){
-      const rf = parseRF();
-      const funds = rf.funds||[];
-      const rows = (rf.rows||[]).slice().sort((a,b)=>a.Year!==b.Year? a.Year-b.Year : a.Month-b.Month);
-      const head = document.getElementById('rfHead');
-      const body = document.getElementById('rfBody');
-  
-      const hasFoncuenta = funds.includes('Foncuenta');
-      const hasTotal     = funds.includes('Total');
-      const hasR4Total   = funds.includes('R4 Total');
-      
-      // Saca “R4 Total” del grupo de comparables para que NO se use en el min/max
-      const comparables = funds.filter(f => f !== 'R4 Total');
-      
-      // Orden final de columnas en la tabla:
-      const includeCols = [...comparables];
-      if (hasFoncuenta) includeCols.push('Foncuenta');
-      if (hasTotal)     includeCols.push('Total');
-      // “R4 Total” SIEMPRE la última columna
-      if (hasR4Total)   includeCols.push('R4 Total');
+  function renderRFTable(){
+  const rf = parseRF();
+  const funds = rf.funds || [];
+  const rows = (rf.rows || []).slice().sort((a,b)=> a.Year!==b.Year ? a.Year-b.Year : a.Month-b.Month);
 
-      while(head.children.length>1) head.removeChild(head.lastChild);
-      includeCols.forEach(f=>{ const th=document.createElement('th'); th.className='text-right p-2'; th.textContent=f; head.appendChild(th); });
+  const head = document.getElementById('rfHead');
+  const body = document.getElementById('rfBody');
 
-      function colorForTotal(v){
-        const totals = rows.map(r => r['Total_PCT']).filter(v=>Number.isFinite(v));
-        const tMin = totals.length ? Math.min(...totals) : 0;
-        const tMax = totals.length ? Math.max(...totals) : 0;
-        if (!Number.isFinite(v) || tMax===tMin) return '';
-        const t = (v - tMin) / (tMax - tMin);
-        const r = Math.round(239 - 100*t);
-        const g = Math.round(68  + 117*t);
-        const b = Math.round(68  + 61*t);
-        return `background-color: rgba(${r},${g},${b},0.18); border-color: rgba(${r},${g},${b},0.35);`;
+  // 1) Columnas: todos los fondos menos "R4 Total"
+  const comparables = funds.filter(f => f !== 'R4 Total'); // ← Foncuenta SÍ entra aquí
+  // 2) y "R4 Total" al final
+  const includeCols = [...comparables];
+  if (funds.includes('R4 Total')) includeCols.push('R4 Total');
+
+  // 3) Cabecera de la tabla
+  while (head.children.length > 1) head.removeChild(head.lastChild);
+  includeCols.forEach(f => {
+    const th = document.createElement('th');
+    th.className = 'text-right p-2';
+    th.textContent = f;
+    head.appendChild(th);
+  });
+
+  // 4) Escala cromática propia para "R4 Total"
+  function colorForTotal(v){
+    const totals = rows.map(r => r['R4 Total_PCT']).filter(v => Number.isFinite(v));
+    const tMin = totals.length ? Math.min(...totals) : 0;
+    const tMax = totals.length ? Math.max(...totals) : 0;
+    if (!Number.isFinite(v) || tMax === tMin) return '';
+    const t = (v - tMin) / (tMax - tMin);
+    const r = Math.round(239 - 100*t);
+    const g = Math.round(68  + 117*t);
+    const b = Math.round(68  + 61*t);
+    return `background-color: rgba(${r},${g},${b},0.18); border-color: rgba(${r},${g},${b},0.35);`;
+  }
+  function displayPct(v){ return Number.isFinite(v) ? (fmtFixed(v,2) + ' %') : '—'; }
+
+  // 5) Cuerpo de la tabla
+  body.innerHTML = '';
+  for (const r of rows){
+    // Mejor/peor del mes entre comparables (incluye Foncuenta; excluye "R4 Total")
+    const vals = comparables.map(f => r[f+'_PCT']).filter(v => Number.isFinite(v));
+    let minV = null, maxV = null;
+    if (vals.length){ minV = Math.min(...vals); maxV = Math.max(...vals); }
+
+    const tr = document.createElement('tr');
+    const td0 = document.createElement('td');
+    td0.className = 'p-2 text-slate-600';
+    td0.textContent = ymLabel(r.Year, r.Month);
+    tr.appendChild(td0);
+
+    includeCols.forEach(f => {
+      const vScaled = r[f+'_PCT'];
+      const td = document.createElement('td');
+      td.className = 'p-2 text-right';
+      td.textContent = displayPct(vScaled);
+
+      // Verde/rojo para TODOS los comparables (incl. Foncuenta), NO para "R4 Total"
+      if (f !== 'R4 Total' && Number.isFinite(vScaled)){
+        if (vScaled === maxV) td.classList.add('bg-emerald-50');
+        if (vScaled === minV) td.classList.add('bg-rose-50');
       }
+
+      // Escala propia para "R4 Total"
+      if (f === 'R4 Total' && Number.isFinite(vScaled)){
+        td.setAttribute('style', colorForTotal(vScaled));
+      }
+      tr.appendChild(td);
+    });
+
+    body.appendChild(tr);
+  }
+}
 
       function displayPct(v){ return Number.isFinite(v) ? (fmtFixed(v, 2) + ' %') : '—'; }
 
