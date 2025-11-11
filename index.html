@@ -212,20 +212,20 @@
     {"Year": 2025, "Month": 9, "R4 FIJA 6M_EUR": 576.19, "R4 FIJA 6M_PCT": 0.179, "R4 Fija Clase A_EUR": 522.65, "R4 Fija Clase A_PCT": 0.208, "R4 Fija Clase R_EUR": 247.302, "R4 Fija Clase R_PCT": 0.213, 
                             "Evli Renta Fija_EUR": 61.80, "Evli Renta Fija_PCT": 0.205, "Foncuenta_EUR": 34.0, "Foncuenta_PCT": 0.1, "B&H Corporativo Total_EUR": 0, "B&H Corporativo Total_PCT":0.00, "R4 Total_EUR": 1442, "R4 Total_PCT":0.19},
     ,{"Year": 2025, "Month": 10, "R4 FIJA 6M_EUR": 565.91, "R4 FIJA 6M_PCT": 0.176, "R4 Fija Clase A_EUR": 564.59, "R4 Fija Clase A_PCT": 0.225, "R4 Fija Clase R_EUR": 322.91, "R4 Fija Clase R_PCT": 0.29, 
-                            "Evli Renta Fija_EUR": 78, "Evli Renta Fija_PCT": 0.26, "Foncuenta_EUR": 128.3, "Foncuenta_PCT": 0.12, "B&H Corporativo Total_EUR": 198, "B&H Corporativo Total_PCT":0.4, "R4 Total_EUR": 1867.71, "R4 Total_PCT":0.23}]}
+                            "Evli Renta Fija_EUR": 78.0, "Evli Renta Fija_PCT": 0.26, "Foncuenta_EUR": 128.3, "Foncuenta_PCT": 0.12, "B&H Corporativo Total_EUR": 198.0, "B&H Corporativo Total_PCT":0.4, "R4 Total_EUR": 1867.71, "R4 Total_PCT":0.23}]}
   </script>
   <script type="application/json" id="ea-data">{"quarters": ["2023-Q3", "2023-Q4", "2024-Q1", "2024-Q2", "2024-Q3", "2024-Q4", "2025-Q1", "2025-Q2", "2025-Q3", "2025-Q4"], "assets": ["Bolsa", "Cash/Foncuenta", "Fondo RV", "Fondos RF"], 
     "values": {"Bolsa": [82519.0, 92445.0, 90134.25, 105978.0, 108924.0, 126716.0, 127888.0, 139608.0, 131558.0, 146905.0], "Cash/Foncuenta": [2635.0, 1122.21, 4623.0, 2900.0, 15998.0, 3890.0, 791.79, 1116.0, 25900.0, 104747.0], 
     "Fondo RV": [102309.0, 108053.0, 111919.23, 105112.0, 95299.0, 97323.0, 90809.0, 93118.0, 131558.0, 146905.0], "Fondos RF": [272795.0, 278214.0, 379469.6, 443964.0, 448322.0, 498277.0, 522092.0, 525870.0, 719550, 771331]}}</script>
 
   <script>
-    const MAX_YEAR=2025, MAX_MONTH=9;
+    const MAX_YEAR=2025, MAX_MONTH=10;
     const monthToLabel=m=>String(m).padStart(2,'0');
     const fmtNumber=(n,maxFrac=2)=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:maxFrac}).format(n);
     const fmtEUR=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
     const fmtFixed=(n,fd=2)=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:fd,maximumFractionDigits:fd}).format(n);
     const dateRank=(y,m)=>new Date(y,m-1,28).getTime();
-    const qEndMonth = q => (q==='Q1'?3:(q==='Q2'?6:(q==='Q3'?9:12)));
+    const qEndMonth = q => (q==='Q1'?3:(q==='Q2'?6:(q==='Q3'?9:(q==='Q4'?10:12)));
 
     function parseJSON(id){ try{ return JSON.parse(document.getElementById(id).textContent.trim()||'[]'); }catch(e){ console.error('JSON parse error for',id,e); return id==='ec-data'?{}:[]; } }
     function filterMaxDate(rows){ return rows.filter(d => (d.Year<MAX_YEAR) || (d.Year===MAX_YEAR && d.Month<=MAX_MONTH)); }
